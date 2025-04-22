@@ -3,38 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Portfolio</title>
+    <title>Nicoline Nymand-Andersen</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>Hi, I'm Your Name</h1>
-        <p>Web Developer | Designer | Tech Enthusiast</p>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        <img src="images/Portrait.PNG">
+        <br>
+        <h1>Nicoline Rosa Westrin Nymand-Andersen</h1>
+        <h2 style="font-size: 19px;color:#494949;">M.Sc. Computer Science, Artificial Intelligence</h2>
+        <br>
+        <h2 style="font-size: 14px;color:#494949;">Hello! Welcome to my page where I present my hobbies, interests and professional work. For context, I am graduating from my double degree in Computer Science at TUM and 
+            Artificial intelligence from IP Paris in the summer of 2025. I am eager to continue creating sustainable artificial intelligence that benefits our democratic society. Currently looking for research or full-time 
+            opportunities! If this piques your interest, please do not hesitate to get in touch with me!</h2>
+        <br>
+            <p>
+                <a href="mailto:niconymand@gmail.com" style="margin-right: 3px; color: navy; text-decoration: none;" aria-label="Email">
+                    niconymand@gmail.com <i class="fa-regular fa-envelope"></i>
+                </a>
+                <a>|</a>
+                <a href="https://www.linkedin.com/in/nicoline-nymand-andersen-364203199/" target="_blank" style="margin-left: 3px; color: navy; text-decoration: none;" aria-label="LinkedIn">
+                   <i class="fa-brands fa-linkedin"></i>
+                </a>
+            </p>
+        <!-- <p>Email: <a href="mailto:niconymand@gmail.com">niconymand@gmail.com</a> | Linkedin: <a href="https://www.linkedin.com/in/nicoline-nymand-andersen-364203199/">Linkedin</a></p> -->
     </header>
 
     <main>
         <section class="about">
-            <h2>About Me</h2>
-            <p>This is a short paragraph about who you are, what you do, and what you're passionate about.</p>
+            <h2>Skills</h2>
+            <div class="box-container">
+                <div class="info-box">
+                    <p style="font-size: 14px;color:#494949;">Machine Learning</p>
+                    <p>3 years of experience in machine-, deep- and reinforcement learning for classification, nlp and computer vision tasks. Proficient in libraries such as Pandas, Sklearn, Tensorflow.</p>
+                </div>
+                <div class="info-box">
+                    <p style="font-size: 14px;color:#494949;">Model Finetuning</p>
+                    <p>Skilled in finetuning foundation and interact models on domain-specific tasks. Enhancement of model performance through hyperparameter optimisation and transfer learning techniques.</p>
+                    </div>
+                <div class="info-box">
+                    <p style="font-size: 14px;color:#494949;">Data Science</p>
+                    <p>5+ years of experience building data pipelines ETL in Python and SQL. Data-visualisation in frontend as actionable insights.</p>   
+                </div>
+            </div>
         </section>
 
         <section class="projects">
             <h2>Projects</h2>
-            <ul>
-                <li><strong>Project One:</strong> Description of your project.</li>
-                <li><strong>Project Two:</strong> Description of your project.</li>
-                <li><strong>Project Three:</strong> Description of your project.</li>
-            </ul>
+
+            <div class="box-container">
+                <div class="info-box">
+                    <p style="font-size: 14px;color:#494949;">K-NN Chain Algorithm</p>
+                    <img style="width: 80%;" src="images/nnchain.gif" >
+                    <p>The K-NN Chain algorithm is a novel approach to make hierarchical agglomerative clustering more scalable. By making use of dynamic distance computation,
+                        this method manages to reduce memory complexity exponentially and time complexity in a majority of cases.
+                    </p>
+                </div>
+                <div class="info-box">
+                    <p style="font-size: 14px;color:#494949;">Defence Against the Deepfake Arts</p>
+                    <img src="images/dada.png" >
+                    <p> Currently audio deepfake detection methods focus on the acoustic signal and learn to spot artifacts produced by specific deepfake generators.
+                        This makes them inherently brittle when deployed to real-world datasets. This project focuses therefore on leveraging both speech and text models, 
+                        in order to incorporate both acoustic anomalies and a context for a given speaker, which are then fed into a classifier fine-tuned for deepfake detection.</p>
+                </div>
+                <div class="info-box">
+                    <p style="font-size: 14px;color:#494949;">Generative Spacecraft Design</p>
+                    <img src="images/spacecraft_design.jpg" >
+                    <p>Development of a data corpus to ameliorate the response capabilities of existing NLP models. Using the provided data, the model is then able to answer 
+                        inquiries regarding suitable spacecraft instruments based on a given space-mission statement.</p>
+                </div>
+                
+                <!-- <div style="flex-basis: 100%; height: 0;"></div>
+                
+                <div class="info-box">
+                    <p style="font-size: 14px;color:#494949;">Sierpiński triangle</p>
+                    <img src="images/Portrait.PNG" >
+                    <p>Development of a data corpus to ameliorate the response capabilities of existing NLP models. Using the provided data, the model is then able to answer inquiries regarding suitable spacecraft instruments based on a given space-mission statement.</p>
+                </div>
+                <div class="info-box">
+                    <p style="font-size: 14px;color:#494949;">Copenhagen Metro</p>
+                    <img src="images/Portrait.PNG" >
+                    <p>Development of a data corpus to ameliorate the response capabilities of existing NLP models. Using the provided data, the model is then able to answer inquiries regarding suitable spacecraft instruments based on a given space-mission statement.</p>
+                </div> -->
+            </div>
+            
         </section>
 
-        <section class="contact">
-            <h2>Contact</h2>
-            <p>Email: <a href="mailto:you@example.com">you@example.com</a></p>
+        <section class="cv">
+            <h2>Curriculum Vitae</h2>
+            <div style="display: flex; justify-content: center;">
+                <iframe src="images/2025_CV (2).pdf#toolbar=0" width="94%" height="1066px" style="border:none;" title="Non-downloadable PDF Viewer">
+                    This browser does not support PDFs. Please download the PDF to view it: <a href="images/2025_CV (2).pdf">Download CV</a>.
+                </iframe>
+            </div>
+            
         </section>
+
+        <section class="extra">
+            <h2>Interests and hobbies</h2>
+            <h3>Ballet</h3>
+            <p>I have been dancing ballet since I was about 6 years old. It has been an integral part of my life; ballet gives me a sort of freedom of expression, and it has been a constant throughout my entire life. As an adult I still take classes, and try to improve my technique. I also dance other dances: contemporary, tango, flamenco, jazz. </p>
+            <h3>Skiing</h3>
+            <p>I normally ski every winter, normally in Austria, and I love it for the sport, the outdoor, the views, and the apres-ski-bars. I have skied since I was a young child. It would be my dream to go skiing in Japan, and enjoy the fantastic weather, scenery and bouncy snow!</p>
+            <h3>Brain-workouts!</h3>
+            <p>Whether it is finishing a Sudoku (faster than 99% on Sudoku.com), solving a rubik's cube (can solve in about 2 mins), or playing one or two rounds of chess with friends (though I absolutely am a beginner)!</p>
+            <h3>Space</h3>
+            <p>I find space absolutely fascinating, cool and humbling. I have worked with the chair for Pico and Nano Satellites at TUM and I have worked at the European Space Agency to integrate AI in their pipeline.</p>
+            <h3>Art</h3>
+            <p>I don't make art myself, but I highly appreciate artwork. When I am rich and famous, I can imagine opening a non-profit art gallery, in attempt to incorporate art with the younger generation.</p>
+            <h3>Politics and democracy</h3>
+            <p>I enjoy following politics in the EU and internationally. I strongly align with european and democratic values. I would be highly motivated to continue creating AI, which could also contribute to society in some way!</p>
+            <h3>Feminism</h3>
+            <p>I believe that unfortunately women still do not have the same opportunities as men, which has become increasingly prominent as I am working in a male-dominated field. I am a strong believer in equal opportunities and fairness.</p>
+            <h3>Travelling</h3>
+            <h3>My dogs</h3>
+            </section>
+
     </main>
 
     <footer>
-        <p>&copy; 2025 Your Name</p>
+        <p>&copy; 2025 Nicoline R. W. Nymand-Andersen</p>
     </footer>
 </body>
 </html>
