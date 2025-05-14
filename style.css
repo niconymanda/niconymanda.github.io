@@ -70,6 +70,16 @@ main {
     margin: auto;
 }
 
+.info-box a {
+    text-decoration: none; 
+    font-size: 14px;
+    color:#494949;
+  }
+
+.info-box a:hover {
+    color: #000000;
+  }
+
 p {
     color: #000000;
     line-height: 1.6;
