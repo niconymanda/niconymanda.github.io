@@ -20,42 +20,475 @@
         <script id="MathJax-script" async
             src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
         </script>
-        <section class="about"  style="left: 4%;">
+        <section class="about"  style="padding-left: 15%; padding-right: 15%;">
             <div class="box-container">
                 <div class="info-box">
                     <h2>The K-NN Chain Algorithm: Scalable Hierarchical Agglomerative Clustering through Dynamic Nearest Neighbour Calculations</h2>
+                    <p style="text-align: center;">Nicoline Rosa Westrin Nymand-Andersen, Thomas Bonald, Raji Ghawi, Charlotte Laclau, Jürgen Pfeffer</p>
                     <br>
                     <p>
-                        <b>Abstract.</b> Hierarchical clustering is a leading technique for grouping similar objects in datasets, offering the distinct advantage of detecting these patterns at multiple levels of granularity. This makes it particularly valuable in fields such as biology, finance, and social sciences, where understanding relationships across different scales is crucial. However, the high time and memory complexities of hierarchical clustering algorithms, particularly when scaling to large datasets, pose significant challenges. Optimised algorithms like NN Chain improve upon traditional methods but still face bottlenecks with quadratic time and memory complexity \(O(n^2)\) since it requires the computation and storage of a distance matrix.
-                        This paper introduces a new approach, the K-NN chain, an algorithm, which reduces time and memory requirements by dynamically computing distances and storing only the \(k\)-nearest neighbours at each step in the chain. The memory complexity is \(O(n)\), making the algorithm significantly more scalable compared to alternatives. Additionally, the K-NN chain algorithm enhances flexibility by incorporating sample weights, allowing for the adjustment of the relative importance or stability of each cluster.
+                        <b>Abstract.</b> Hierarchical clustering is a leading technique for grouping similar objects in datasets, offering the distinct advantage of detecting these patterns at multiple levels of granularity. This makes it particularly valuable in fields such as biology, finance, and social sciences, where understanding relationships across different scales is crucial. However, the high time and memory complexities of hierarchical clustering algorithms, particularly when scaling to large datasets, pose significant challenges. Optimised algorithms like NN Chain improve upon traditional methods but still face bottlenecks with quadratic time and memory complexity  \(O(n^2)\) since it requires the computation and storage of a distance matrix.
+                        This paper introduces a new approach, the K-NN chain, an algorithm, which reduces time and memory requirements by dynamically computing distances and storing only the  \(k\)-nearest neighbours at each step in the chain. The memory complexity is  \(O(n)\), making the algorithm significantly more scalable compared to alternatives. Additionally, the K-NN chain algorithm enhances flexibility by incorporating sample weights, allowing for the adjustment of the relative importance or stability of each cluster.
                     </p>
                     <br>
-                    <h3>Introduction</h3>
-                    <p></p>
+                    <h3>1. Introduction</h3>
+                    <p>Hierarchical agglomerative clustering identifies patterns in datasets by iteratively merging similar observations based on a similarity measure [1]. The method enables analysis at different cluster levels, which is useful in fields like biology, finance, and social sciences. However, traditional hierarchical agglomerative clustering, developed decades ago, struggles with modern big data. The <i>nearest neighbour chain algorithm (NN Chain)</i>[2] compares the distances to all sample pairs, resulting in \(O(n^2)\) complexity.
+                      <br>
+                        To address this, we propose a scalable alternative: the <i>k-nearest neighbour chain (K-NN chain)</i>. Unlike NN Chain, the K-NN chain computes distances dynamically, reducing memory overhead and enhancing scalability. It maintains a dynamic list of the \(k\) nearest neighbours for each cluster, preventing redundant distance recalculations. The K-NN chain furthermore retains the <i>reducibility</i> property [3], ensuring structure is preserved even as clusters merge.
+                        <br>
+                        This paper is organised as follows: Section 2 reviews relevant literature on clustering and sample weights. Section 3 presents the K-NN Chain algorithm. Sections 4 and 5 evaluate the algorithm’s performance through experiments on synthetic and real-world datasets. Section 6 discusses limitations and future work.</p>
 
                     <br>
-                    <h3>Hierarchical agglomerative clustering methods</h3>
-                    <p></p>
+                    <h3>2. Hierarchical agglomerative clustering methods</h3>
+                    <p>Clustering methods are generally classified into two broad categories: partitional and hierarchical. The former involves dividing a dataset into a predefined number of non-overlapping clusters, whereas the latter iteratively merges or splits clusters based on a similarity metric and constructs a hierarchical structure.
+                        In this paper, we focus on hierarchical clustering methods, which offer more flexibility in capturing the underlying structure of datasets. These methods rely on different linkage types, each defining how clusters are merged based on distance or similarity measures. 
+                        <br>
+                        For the purposes of this literature review, we define \(a\), \(b\), and \(c\) as any arbitrary disjoint clusters in an n-dimensional space and let \(g(a), g(b)\) be their respective centroids. The union of clusters is signified with \(\cup\) and \(d\) is a function of distance. These definitions hold throughout this section.
+                        <br>
+                        <br>
+                        <b>2.1 Linkage Types. </b>
+                        There exist several approaches for clustering data using distance-based similarity measures. 
+                        One such method is <i>single linkage</i>, which focuses on merging clusters by considering the shortest distance between two points from different clusters [4].
+                        In contrast, <i>complete linkage</i> forms clusters based on the largest distance between points in separate clusters [5].
+                        <i>Group average linkage</i> finds a middle ground by averaging the distances between all points in their respective clusters [6] and <i>centroid linkage</i> focuses on the centroid of each cluster to determine the nearest cluster [7]. Finally, <i>ward</i> merges clusters based on minimising the increase in the total sum of squared distances [8]. 
+                        The Lance-Williams dissimilarity update formula conveniently summarises the update of the similarity measure for all aforementioned methods [9]. 
+                        \begin{equation} \label{eq1}
+                          d(a \cup b, c) = \alpha_{a} d(a,c) + \alpha_{b} d(b,c) + \beta d(a,b) + \gamma |d(a,c) - d(b,c)|
+                        \end{equation}
+                        , whereby the coefficients are defined by Table \ref{tab:coeffs}:</p>
+                        
+                        <br>
+
+                        <table class="data-table">
+                            <caption><strong>Coefficient values for linkage types</strong> ~<a href="#ran">[ran]</a></caption>
+                            <thead>
+                              <tr>
+                                <th>Methods</th>
+                                <th>Coefficient \( \alpha_i \)</th>
+                                <th>Coefficient \( \beta \)</th>
+                                <th>Coefficient \( \gamma \)</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>Single</td>
+                                <td>\( 0.5 \)</td>
+                                <td>\( 0.5 \)</td>
+                                <td>\( 0.5 \)</td>
+                              </tr>
+                              <tr>
+                                <td>Complete</td>
+                                <td>\( 0.5 \)</td>
+                                <td>\( 0 \)</td>
+                                <td>\( 0.5 \)</td>
+                              </tr>
+                              <tr>
+                                <td>Group avg.</td>
+                                <td>\( \frac{|a|}{|a| + |b|} \)</td>
+                                <td>\( 0 \)</td>
+                                <td>\( 0 \)</td>
+                              </tr>
+                              <tr>
+                                <td>Centroid</td>
+                                <td>\( \frac{|a|}{|a| + |b|} \)</td>
+                                <td>\( -\frac{|a|}{(|a| + |b|)^2} \)</td>
+                                <td>\( 0 \)</td>
+                              </tr>
+                              <tr>
+                                <td>Ward</td>
+                                <td>\( \frac{|a| + |c|}{|a| + |b| + |c|} \)</td>
+                                <td>\( -\frac{|c|}{|a| + |b| + |c|} \)</td>
+                                <td>\( 0 \)</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                          <br>
+                        <p>Single, complete, group average and centroid linkage all fulfil the <i>reducibility</i> property [10], which enables algorithms to perform more efficiently. 
+                        <br>
+                        <i> Definition. Linkage </i> [10]
+                        <br>
+                        The distances between a merging of two clusters are called <i>reducible</i> if:
+                        \begin{equation} \label{eq2}
+                            d(a \cup b, c) \ge min(d(a,c), d(b,c))
+                        \end{equation}
+                        <br>
+                        <br>
+                        <b>2.2 Ward's minimum variance.</b>
+                        Ward is a leading distance metric based on the sum of squared errors [8]. 
+                        \begin{equation} \label{eq3}
+                        g(a) = \frac{1}{|a|} \cdot \sum_{i \in c} x_i
+                        \end{equation}
+                        then the centroid of the merging of clusters \(a\) and \(b\) [3]:
+                        \begin{equation} \label{eq4}
+                        g(a \cup b) = \frac{|a| \cdot g(a) + |b| \cdot g(b)}{|a|+|b|}
+                        \end{equation}
+                        , whereby \(|*|\) denotes the cardinality of the clusters. 
+                        <br>
+                        The distance between the clusters \(a\) and \(b\) are calculated as [3]:
+                        \begin{equation} \label{eq5}
+                        d(a, b) = \frac{|a| \cdot |b|}{|a| + |b|} \cdot ||g(a) - g(b)||^2
+                        \end{equation}
+                        , whereby \(||*||\) denotes an arbitrary norm, and \(d(a,b) \ge 0\). This represents the increase in within-cluster variance caused by merging clusters \(a\) and \(b\).
+                        <br>
+                        Ward satisfies a weak form of reducibility, a property which reduces the NN chain's runtime complexity from \(O(n^3)\) to \(O(n^2)\), since any clusters \(a,b\) that are nearest to each other can be merged:
+                        
+                        \begin{equation}\label{eq6}
+                              % \begin{gathered}
+                                d(a, b) = \min_{\underset{c}{}} d(a, c) = \min_{\underset{c}{}} d(b, c)
+                              % \end{gathered}
+                            \end{equation}
+                        
+                        <br>
+                        <i>Theorem. Reducibility [3].</i>
+                            \begin{equation}\label{eq7}
+                              % \begin{gathered}
+                                d(a, b) \leq min(d(a, c), d(b, c)) \Rightarrow d(a \cup b, c) \geq min(d(a, c), d(b, c)).
+                              % \end{gathered}
+                            \end{equation}
+
+                        This property allows for the merging of clusters that are nearest to each other without necessarily finding the
+                        global minimum distance at each step. Instead, clusters can be merged based on local minimum criteria, which streamlines the clustering process. 
+                        <br>
+                        <br>
+                        <b>2.3 Algorithms.</b>
+                        Several algorithms have been proposed to find hierarchical structures.
+                        <br>
+                        The generic clustering algorithm by Müllner [11] works with the upper triangle of the distance matrix and handles any distance update formula. Its priority queue rapidly identifies the closest pair, with a worst-case complexity of \(O(n^{3})\).
+                        <br>
+                        The MST algorithm is efficient for single linkage clustering, avoiding the full minimum spanning tree calculation while still producing meaningful clusters[11]. Its worst-case complexity is \(O(n^{2})\).
+                        <br>
+                        The choice of algorithm depends on factors such as implementation, machine architecture, and distance update schemes[11]. For single linkage clustering, the MST algorithm is the best for worst-case complexity and performance. For centroid linkage, the generic clustering algorithm is recommended, while for complete, average, and ward linkage methods, the NN chain algorithm is preferred, with a worst-case complexity of \(O(n^{2})\).
+                        <br>
+                        <i>2.3.1 NN Chain.</i>
+                        The NN chain algorithm [2] constructs a chain from the distance matrix by randomly selecting a point and iteratively identifying its nearest neighbour. This process continues until a pair of points, <i>reciprocal nearest neighbours</i>, are identified. The agglomeration of these can proceed instantly [1]. The correct NN chain algorithm [11] has been implemented for single, complete, average and ward, since all of these satisfy at least a weak form of reducibility [3]. This property ensures a runtime of \(O(n^2)\).
+                        <br>
+                        <br>
+                        <b>2.4 Sample weights.</b>
+                        
+                        Cluster weights are useful, when you do not want to treat all clusters equally. Weights allow for more flexiblity, accuracy, and meaningful partitions of data.
+                        <br>
+                        However, different linkage methods react to weights in distinct ways [12]. For instance, algorithms are said to be <i>weight-responsive</i> 
+                        if (1) there exists a weight assignment produces a specific clustering \(C\), and if (2) there exists a weight assignment that does not produce \(C\).
+                        An algorithm is considered <i>weight-sensitive</i> if, for every possible set of data and distance function, it always responds to weights in a way that the algorithm’s behaviour depends on the weights assigned.
+                        <br>
+                        Ward's method is a weight-sensitive algorithm, meaning the distance between two clusters is strongly influenced by the assigned weights. These weights can, in turn, have a substantial impact on the final clustering outcome.</p>
 
                     <br>
-                    <h3>K-NN Chain Algorithm</h3>
-                    <p></p>
+                    <h3>3. K-NN Chain Algorithm</h3>
+                    <p>We introduce the K-NN chain algorithm, which differs from NN chain by: </p>
+                        <ol class="math-list">
+                            <li>
+                              calculating the distances dynamically from one cluster to another, and
+                            </li>
+                            <li>
+                              storing the \(k\)-nearest neighbours at each iteration in the chain.
+                            </li>
+                        </ol>
+                        
+                        <p>The K-NN chain algorithm additionally supports custom sample weights, providing greater flexibility in adjusting cluster outcomes, especially since it employs the weight-sensitive ward method.
+                        <br>
+                        Since the K-NN chain alters the way in which distances are handled, it is important to ensure the algorithm maintains its correctness, while still executing as efficiency as possible. More specifically, it must be verified whether merges involving clusters outside of the \(k\)-nearest neighbours of a given cluster compromise the legitimacy of the stored \(k\)-nearest neighbours. Thereby, it can be confirmed that the algorithm consistently produces valid results, even when using \(k\)-nearest neighbours for clustering decisions.
+                        <br>
+                        <br>
+                        <b>3.1 Correctness.</b>
+                        The correctness of the algorithm is guaranteed by the reducibility property of the Ward method. This property guarantees that merging events occurring outside the set of \(k\)-nearest neighbours do not alter its composition. 
+                        <br>
+                        <i>Definition. K-Nearest Neighbour.</i>
+                        <br>
+                        The \(k\)-nearest neighbours of any cluster <i>a</i> are defined as the set of \(k\) clusters, whose distances to <i>a</i> are smaller than or equal to any clusters that are not in the set:
+                        \begin{equation} \label{eq8}
+                            K(a) = 
+                                \{ x_1, \dots, x_k \mid x_i \neq x_j,
+                                \forall y \notin K(a), \ d(a, x_i) \leq d(a, y) \}
+                        \end{equation}
+                        <br>
+                        <i>Corollary. K-NN Stability Property.</i>
+                            Let \(a\), \(b\), \(c\) and \(e\) be disjoint clusters and \(d\) be a distance metric, and let \(K(a)\) be the \(k\)-nearest neighbours before, and \(K'(a)\) be the \(k\)-nearest neighbours after the merge, where \(b \in K(a)\) and \(c\), \(e \notin K(a)\). If clusters \(c\), \(e\) merge to form a new cluster \(c \cup e\), then \(b\) remains in the \(k\)-nearest neighbours, \(K'(a)\):
+                            \begin{equation} \label{eq9}
+                                \forall_{
+                                     b \in K(a), c, e \notin K(a)
+                                    } : \hskip 0.05 in d(a, c \cup e) \ge d(a, b) \\
+                                    \Rightarrow b \in K'(a)
+                            \end{equation}
+                        
+                        <br>
+                        <i>Proof.</i> Since we know that \(b \in K(a)\), \(c, e \notin K(a)\) : 
+                            \begin{equation} \label{eq10}
+                                d(a,b) \le min(d(a, c), d(a, e))
+                            \end{equation} 
+                            Furthermore, by Theorem \ref{red_theorem} (Reducibility), we know:
+                            \begin{equation} \label{eq11}
+                                d(a, c \cup e) \ge min(d(a, c), d(a, e))
+                            \end{equation} 
+                            Summarising equations (\ref{eq10}), (\ref{eq11}):
+                            \begin{equation} \label{eq12}
+                                \forall_{
+                                     b \in K(a), c, e \notin K(a)
+                                    } :  d(a, c \cup e) \ge d(a, b)
+                            \end{equation}
+                            This implies, that \(c \cup e\) cannot ever be in \(K'(a)\). Thus, using the definition of \(K'(a)\):
+                            \begin{equation} \label{eq13}
+                                \forall_{
+                                     b \in K(a), c, e \notin K(a)
+                                    } : \hskip 0.05 in d(a, c \cup e) \ge d(a, b) \Rightarrow b \in K'(a)
+                            \end{equation}
+                        <br>
+                        This proof demonstrates that if the top nearest neighbour merges, only the newly merged cluster and the second nearest neighbour need to be compared. This makes the chain more efficient, as it eliminates the need to re-evaluate the entire neighbourhood from scratch. This reduces the number of computations to find the nearest neighbours. 
+                        <br>
+                        <br>
+                        <b>3.2 Pseudocode.</b></p>
+                        
+                        <figure class="centre-figure" style="width: 50%;">
+                          <img src="images/knn/algorithm.png">
+                          <!-- <figcaption><strong>Figure 1:</strong> Runtime complexity of K-NN chain synthetic datasets for different values of k</figcaption> -->
+                        </figure>
+                        
+                        <p>The algorithm \ref{knn_alg} is passed an initial set of clusters, \(c\), and a specified number of nearest neighbours, \(k\). An <i>active</i> set tracks the clusters that have yet to be merged, while an empty list is initialised to represent the <i>chain</i>.
+                        <br>
+                        The first loop ensures that the chain process does not terminate until all active clusters have been merged. The chain is initiated with cluster \(a\), and its \(k\)-nearest neighbours are calculated, the closest of which is defined as \(b\).
+                        <br>
+                        Subsequently, at each step in the chain the algorithm selects the most recently added cluster (the last element in the chain). \(b\) is defined as the closest neighbour. Since distances are computed dynamically, three possible cases can occur: 
+                    </p>
+                        
+                    <ol>
+                        <li>
+                            <i>All nearest neighbours are active:</i> The previously defined \( b \) remains the nearest neighbour of \( a \).
+                        </li>
+                        <li>
+                            <i>All nearest neighbours are inactive:</i> If all of the \( k \)-nearest neighbours are inactive, the algorithm recalculates the \( k \)-nearest neighbours for \( a \), and \( b \) is redefined accordingly.
+                        </li>
+                        <li>
+                            <i>Some nearest neighbours are inactive:</i> In this case, we consider the first \( m-1 \) nearest neighbours of \( a \) to be inactive (indicating that those neighbours were merged in a previous step). The \( m^{\text{th}} \)-nearest neighbour is the first active nearest neighbour of \( a \).Since the \( m-1 \) inactive neighbours may no longer be the closest to \( a \), we must reassess how the inactive neighbours have been reclustered and recalculate their distances to \( a \). These distances are then compared with the distance to the \( m^{\text{th}} \) nearest neighbour. This approach is valid due to the K-NN stability property <code>\ref{knn_stab}</code>, which ensures that only the top \( m \)-nearest neighbours need to be considered. \( b \) is then redefined as the nearest neighbour of this \( m \)-nearest-neighbour list.
+                        </li>
+                    </ol>
+                        
+                    <p>Following this, the algorithm checks whether \(b\) is a reciprocal nearest neighbour. If this condition holds true, then \(a\) and \(b\) are removed from the <i>chain</i> and the <i>active</i> set, and they are subsequently merged. The resulting merged cluster, \(a \cup b\), is appended to the active clusters. However, if the condition does not hold, then \(b\) is appended to the chain and the \(k\)-nearest neighbours of \(b\) are calculated. </p>
 
                     <br>
-                    <h3>Datasets</h3>
-                    <p></p>
+                    <h3>4. Datasets</h3>
+                    <p>The complexity of K-NN chain is benchmarked in terms of runtime and memory using synthetic as well as real-world datasets. 
+<br>
+                        <br>
+                        <b>4.1 Generated, synthetic datasets.</b>
+                        Synthetic datasets are essential tools for evaluating algorithm performance, as they provide a controlled environment for benchmarking and make it easier to isolate the effects of environmental factors on algorithm performance. Furthermore, synthetic datasets are easily reproducible, as they are not impacted by randomness or bias. Table \ref{tab:sds} summarises the 15 synthetic datasets that were created.
+                    </p>
+                    <br>
+                    <table  class="data-table">
+                        <caption>
+                            Synthetic dataset (sds) characterisation
+                        </caption>
+                        <thead>
+                            <tr>
+                            <th><strong>Dataset</strong></th>
+                            <th><strong>Samples</strong></th>
+                            <th><strong>Features</strong></th>
+                            <th><strong># of gaussians</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>sds 1</td><td>1000</td><td>2</td><td>6</td></tr>
+                            <tr><td>sds 2</td><td>5000</td><td>5</td><td>10</td></tr>
+                            <tr><td>sds 3</td><td>10000</td><td>10</td><td>15</td></tr>
+                            <tr><td>sds 4</td><td>15000</td><td>10</td><td>20</td></tr>
+                            <tr><td>sds 5</td><td>20000</td><td>15</td><td>30</td></tr>
+                            <tr><td>sds 6</td><td>1000</td><td>2</td><td>16</td></tr>
+                            <tr><td>sds 7</td><td>6000</td><td>5</td><td>25</td></tr>
+                            <tr><td>sds 8</td><td>10500</td><td>10</td><td>36</td></tr>
+                            <tr><td>sds 9</td><td>15120</td><td>15</td><td>36</td></tr>
+                            <tr><td>sds 10</td><td>22400</td><td>15</td><td>48</td></tr>
+                            <tr><td>sds 11</td><td>22400</td><td>2</td><td>48</td></tr>
+                            <tr><td>sds 12</td><td>22400</td><td>50</td><td>48</td></tr>
+                            <tr><td>sds 13</td><td>22400</td><td>100</td><td>48</td></tr>
+                            <tr><td>sds 14</td><td>22400</td><td>500</td><td>48</td></tr>
+                            <tr><td>sds 15</td><td>22400</td><td>1000</td><td>48</td></tr>
+                        </tbody>
+                    </table>
+                    <br>
+                          
+                        <p>All datasets have been created with gaussian distributions, and vary in the number of samples and features in order to systematically analyse how changes affect both runtime and memory efficiency. They thus highlight K-NN chain's scalability and performance under different conditions.
+                        <br>
+                        Synthetic datasets 6-10 were specifically created to demonstrate the effects of different granularities. The samples were typically generated with several larger gaussian distributions, each containing smaller gaussian distributions within them. This setup could represent, for instance, the categorisation of different news segments, each of which contains more specific subsegments.  
+                        <br>
+                        Finally, synthetic datasets 11-15 illustrate the impact of feature size on the algorithms and also capture the effects of varying granularities.
+                        <br>
+                        <br>
+                        <b>4.2 Real world datasets.</b>
+                        For evaluating the performance of the proposed algorithm, several widely known real-world datasets from different domains, such as image recognition or natural language processing are employed for the experiments.
+                        </p>
+                        <br>
+                        <table class="data-table">
+                          <caption><strong>Real-world dataset characterisation</strong></caption>
+                          <thead>
+                            <tr>
+                              <th>Dataset</th>
+                              <th>Samples</th>
+                              <th>Features</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr><td>Blood Transfusion</td><td>748</td><td>5</td></tr>
+                            <tr><td>BBC News</td><td>2,225</td><td>9,635</td></tr>
+                            <tr><td>White Wine Quality</td><td>4,898</td><td>11</td></tr>
+                            <tr><td>Red Wine Quality</td><td>1,599</td><td>11</td></tr>
+                            <tr><td>California Housing</td><td>20,640</td><td>8</td></tr>
+                            <tr><td>MNIST</td><td>30,000</td><td>784</td></tr>
+                            <tr><td>Fashion MNIST</td><td>30,000</td><td>784</td></tr>
+                            <tr><td>Adult Census</td><td>34,190</td><td>25</td></tr>
+                            <tr><td>Bike rides</td><td>38,254</td><td>7</td></tr>
+                          </tbody>
+                        </table>
+                        <br>
+                        <p><i>Blood Transfusion</i> [13] dataset captures the donation behaviour of individuals who intended to donate blood. The <i>BBC News</i> [14] dataset consists of documents across five topical categories: business, entertainment, politics, sports, and technology. Each category naturally also contains some subcategories. The <i>Wine Quality</i> [15] datasets comprise samples of both red and white wines from the "Vinho Verde" region in northern Portugal. The <i>California Housing</i> [16] dataset contains information on the average household characteristics across various districts in California. The <i>MNIST</i> [17] dataset is a well-known image dataset consisting of handwritten digit images, each of size 28 × 28 pixels, representing the digits from 0 to 9. The <i>Fashion MNIST</i> [18] contains clothing images taken from 10 categories, such as shirts, dresses, each of size 28 x 28 pixels in grayscale. For both Fashion- and MNIST experiments, only the first 30,000 samples were considered.
+                        The <i>Adult Census</i> [19] dataset, also known as the "Census Income" dataset, is derived from the 1994 US Census database. 
+                        Finally, the <i>Bike rides</i> [20] dataset contains GPS recordings and performance recordings of a cyclist. Four cycling sessions were recorded and variables are measured every second. 
+                        <br>
+                        These real-world datasets were chosen for their diversity across domains and varying sample and feature sizes to capture the algorithms' performance under different conditions, ranging from high-dimensional news segments to household characteristics in different Californian districts. Ultimately, the goal is to provide a robust evaluation that reflects the complexities when applying these algorithms in practice.</p>
 
                     <br>
-                    <h3>Experiments and Results</h3>
-                    <p></p>
+                    <h3>5. Experiments and Results</h3>
+                    <p>The K-NN chain was implemented in C++ and bound to Python using Pybind11. The experiments were performed using a remote connection. The operating system was Ubuntu 24.04.1 LTS with 128 threads and 519.63 GB of memory. The Python version is 3.12.3, the SciPy version is 1.14.1, and the numpy version is 1.26.4. The compiler is gcc version 13.2.0. Experiments were run a total of \(n = 20\) times and results were averaged in order to obtain an accurate measure of the efficiency. 
+<br>
+                        <br>
+                        <b>5.1 Time complexity analysis.</b>
+                        By computing distances on-the-fly and tweaking the parameter \(k\), the K-NN chain should ideally result in an improvement in runtime efficiency.
+                        <br>
+                        <i>5.1.1 Runtime: different values for \(k\).</i>
+                        Given that the K-NN chain algorithm allows for the tweaking of \(k\), experiments to evaluate how varying \(k\) influences the algorithm's runtime were conducted. In particular, it is expected that using \(k>1\) should result in improved performance compared to \(k=1\). If this expectation holds true, it indicates that storing nearest neighbours at each step offers a computational advantage over recalculating them each iteration.
+                        </p>
+                        <figure class="centre-figure" >
+                          <img src="images/knn/sds_all.png" alt="Runtime complexity of K-NN chain synthetic datasets for different values of k">
+                          <figcaption><strong>Figure 1:</strong> Runtime complexity of K-NN chain synthetic datasets for different values of k</figcaption>
+                        </figure>
+                        <p>
+                        Figure \ref{fig:sds_all} shows significant runtime variation, primarily influenced by dataset size. As dataset size increases, runtime consistently grows. For instance, with \(k=1\), synthetic dataset 1 runs in 0.01 seconds, while synthetic dataset 5 takes about 12 seconds, confirming that runtime complexity is closely tied to the number of samples, \(n\). Similarly, the optimal \(k\), depicted by the dotted red line, increases with the size of the dataset. This trend suggests that as datasets become larger and more complex, storing more neighbours is beneficial to reduce computational overhead. Moreover, the optimal \(k\) is always greater than 1. This indicates that storing the nearest neighbours contributes to some degree to the efficiency of the algorithm. Synthetic dataset 5, for instance, takes only about half the time when \(k=30\) compared to \(k=1\).
+                        <br>
+                        A similar trend is observed with the number of features across datasets. Synthetic datasets 11 to 15 show a sequential increase in runtime, primarily due to the number of features (ranging from 2 to 1000). For \(k=1\), synthetic dataset 11 runs in about 0.01 seconds, while synthetic dataset 15 takes around 6 seconds. This is due to the time-intensive norm calculation required by ward.
+                        <br>
+                        Additionally, while synthetic datasets 3, 4, 5 and 8, 9, 10 share comparable dimensions, the latter datasets appear to execute significantly faster. The only difference between the dataset is its nature. Synthetic datasets 8-10 contain varying levels of granularity. This variation significantly influences the observed runtime patterns, where synthetic dataset 10 executes twice as fast compared to synthetic dataset 5 when \(k=1\).
+                        </p>
+                        <figure class="centre-figure" style="width: 90%;">
+                          <img src="images/knn/real_all.png" alt="Runtime complexity of K-NN chain real-world datasets for different values of k">
+                          <figcaption><strong>Figure 2:</strong> Runtime complexity of K-NN chain real-world datasets for different values of k</figcaption>
+                        </figure>
+                        
+                        <p>The time complexity of real world datasets as seen in Figure \ref{fig:real_all} generally also increases with the dataset size- this is however not as consistent as previously in Figure \ref{fig:sds_all}. For example, BBC News executes in 26 seconds when \(k=1\), while the White Wine dataset executes in under 1 second. And that, even though the former contains about half the number of samples than the latter.
+                    </p>
+                    <br>
+                        <table class="data-table">
+                          <caption><strong>Profiling results of BBC and White Wine</strong></caption>
+                          <thead>
+                            <tr>
+                              <th>Dataset</th>
+                              <th>Function</th>
+                              <th>% of time</th>
+                              <th># of calls</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr><td rowspan="3">BBC News</td><td>knn_chain</td><td>99.5</td><td>1</td></tr>
+                            <tr><td>get_top_k</td><td>99.1</td><td>6,654</td></tr>
+                            <tr><td>ward</td><td>98.3</td><td>7,416,658</td></tr>
+                        
+                            <tr><td colspan="4"><hr></td></tr> 
+                        
+                            <tr><td rowspan="3">White Wine</td><td>knn_chain</td><td>99.6</td><td>1</td></tr>
+                            <tr><td>get_top_k</td><td>97.7</td><td>14,655</td></tr>
+                            <tr><td>ward</td><td>45.0</td><td>35,886,314</td></tr>
+                          </tbody>
+                        </table>
+                        <br>
+                        
+                        <p>Table \ref{tab:profile} investigates the root cause of the runtime discrepancy of BBC News and White Wine. There is a striking difference in the percent of time spent in the ward function. The former spends a whole 98.3\% of its time in ward, the latter merely 45\%, and that even though there are 5 times fewer calls the the ward function. This suggests, that the number of features can lead to a bottleneck in runtime. This bottleneck arises since the ward computation requires vector manipulations, even though these are optimised through parallelisation in the source code. 
+                        <br>
+                        In contrast to the synthetic datasets, the optimal value of \(k\) does not always increase with \(n\). For instance, despite MNIST being large, its optimal \(k\) is around 10, similar to BBC News. This discrepancy arises from the data's nature and the frequency of recalculating and caching nearest neighbours. BBC News contains articles across various categories with subcategories ("football" as a subset of "sports"), whereas MNIST lacks this hierarchical structure, making a larger \(k\) less effective for performance improvement.
+                        <br>
+                        <i>5.1.2 Runtime: precomputed vs. on-the-fly distance computations.</i>
+                        The K-NN chain algorithm's performance was assessed by evaluating its runtime for \(k = 1\) and the optimal \(k\). These results were compared to precomputed distances, as done by the NN chain algorithm in Scipy [21], in order to determine if on-the-fly distance calculations save time and to quantify the savings with the optimal \(k\).
+                        </p>
+                        <figure class="centre-figure" style="width: 70%;">
+                          <img src="images/knn/plot_comparison_sds.png" alt="Precomputed vs. OTF vs. OTF with the optimal \(k\) for synthetic datasets">
+                          <figcaption><strong>Figure 3:</strong> Precomputed vs. OTF vs. OTF with the optimal \(k\) for synthetic datasets</figcaption>
+                        </figure>
+                        <figure class="centre-figure" style="width: 70%;">
+                          <img src="images/knn/plot_comparison_real.png" alt="Comparison of precomputed vs. On-The-Fly (OTF) methods for synthetic and real datasets">
+                          <figcaption><strong>Figure 4:</strong> Comparison of precomputed vs. On-The-Fly (OTF) methods for synthetic and real datasets</figcaption>
+                        </figure>
+                        
+                        <p>Figure \ref{fig:comparison_plots} compares the runtime of three scenarios: precomputed distances, dynamic computation with \(k=1\), and dynamic computation with the optimal \(k\). While no clear winner emerges, dynamic computation outperforms precomputation for synthetic datasets 7-10 and 12-15 (Figure \ref{fig:plot_comparison_sds}), particularly as \(n\) increases. Similarly, for BBC News and California Housing (Figure \ref{fig:plot_comparison_real}), on-the-fly computation is twice as fast. However, precomputing distances is up to eight times faster for MNIST and Fashion MNIST. This can be attributed to the fact that BBC News and California Housing, unlike MNIST and Fashion MNIST, both contain natural hierarchies in their structure.
+                        <br>
+                        Overall, the K-NN chain algorithm, like the NN chain, runs in \(O(n^2)\), but selecting the appropriate algorithm and \(k\) can improve runtime efficiency.
+                        <br>
+                        <br>
+                        <b>5.2 Memory complexity analysis.</b>
+                        
+                        The memory complexity of the K-NN chain algorithm is \(O(n)\), as it computes the distances to at most \(n\) samples in the chain. In contrast, precomputing the distances, as in the NN chain, requires \(O(n^2)\) memory allocations.
+                        <br>
+                        <i>5.2.1 Memory: precomputed vs. on-the-fly distance computations.</i>
+                        Experiments were executed on the K-NN chain algorithm, where \(k = 1\) and on the NN chain algorithm to depict the difference in memory consumption when computing the distances on-the-fly vs. when precomputing these, respectively. </p>
+
+                        <figure class="centre-figure" style="width: 100%;">
+                          <img src="images/knn/mem_syn.png" alt="Memory complexity of Precomputed vs. OTF of synthetic datasets (sds)">
+                          <figcaption><strong>Figure 5:</strong> Memory complexity of Precomputed vs. OTF of synthetic datasets (sds)</figcaption>
+                        </figure>
+                        <figure class="centre-figure">
+                          <img src="images/knn/mem_real.png" alt="Memory complexity of Precomputed vs. OTF of real datasets">
+                          <figcaption><strong>Figure 6:</strong> Memory complexity of Precomputed vs. OTF of real datasets</figcaption>
+                        </figure>
+                        
+                        <p>Figure \ref{fig:mem_plots} shows memory usage across all datasets, where consumption increases with \(n\). For smaller datasets (1 and 6) as seen in Figure \ref{fig:mem_syn}, precomputing distances uses about 4.5M, while on-the-fly computation uses only 184.5K. For larger datasets (10-15), precomputing reaches 2.3B, and on-the-fly computation requires around 4.3M. This rise in memory usage aligns with theoretical expectations, as both approaches scale with dataset size.
+                        <br>
+                        There is moreover a significant disparity in memory consumption between the two algorithms. Since precomputing distances requires a quadratic memory, the disparity between the two algorithm grows with \(n\). Consequently, the K-NN chain becomes increasingly memory efficient. This is apparent in the bike rides dataset in Figure \ref{fig:mem_real}, where calculating distances on-the-fly is up to 900 times more memory efficient than precomputing the distances.
+                        <br>
+                        Additionally, feature size appears to also impact memory consumption for both algorithms, as seen in synthetic datasets 11-15, where memory usage steadily increases. This is due to the higher memory requirements for distance calculations, as larger feature vectors need more memory for storage and processing.</p>
 
                     <br>
-                    <h3>Limitations</h3>
-                    <p></p>
+                    <h3>6. Limitations</h3>
+                    <p>One of the primary challenges in employing the K-NN chain algorithm is determining the optimal value of \(k\). The choice of \(k\) is not straightforward and necessitates careful consideration of the dataset's characteristics. 
+                        Further research could be done to analyse which value for \(k\) is optimal.
+                        <br>
+                        Moreover, while the runtime complexity of the NN chain as implemented by Scipy [21] seems to be rather stable and predictable, the K-NN chain algorithm demonstrates considerably greater variability in its execution time, rendering the K-NN chain less reliable and impacts the scalability.
+                        <br>
+                        Finally, the K-NN chain is limited to ward and cannot be applied to other linkage types.</p>
 
                     <br>
-                    <h3>Conclusion</h3>
-                    <p></p>
+                    <h3>7. Conclusion</h3>
+                    <p>Hierarchical agglomerative clustering is a method for uncovering patterns within datasets at various hierarchies. It struggles, however, to work with large scale datasets- their best algorithms have a runtime and memory complexity of \(O(n^2)\). 
+<br>
+                        This paper introduces the K-NN chain algorithm, a deterministic method that calculates distances on-the-fly, reducing memory overhead and enabling better scalability for large datasets. In some cases, it also improves runtime complexity. This approach overcomes the traditional NN chain algorithm's high memory complexity and incorporates sample weights.
+                        <br>
+                        The runtime experiment results reveal that the dataset size, dimension, nature and choice of \(k\) have an impact on the performance of the algorithm. The optimal choice of \(k\), however, does not necessarily correlate with dataset size.
+                        <br>
+                        Moreover, the results show that computing distances on-the-fly does not always outperform precomputation, with runtime exploding in some experiments. However, the K-NN chain performs well with hierarchical datasets. Choosing an optimal \(k\) can also boost performance.
+                        <br>
+                        Moreover, memory usage increases with larger datasets. There was a growing efficiency gap between precomputed and dynamic distance calculations. The NN chain results in a usage of \(O(n^2)\), while the K-NN chain has a complexity of \(O(n)\).
+                        <br>
+                        In conclusion, the K-NN chain algorithm has significantly improved the memory consumption using dynamic distance calculation and storing \(k\) nearest neighbours in each step in the chain, compared the the NN chain, which uses a preprocessing step to calculate a complete distance matrix. The runtime of K-NN chain improves when working with datasets that have a hierarchical structure and choosing an optimal \(k\). The runtime complexity of the algorithms is \(O(n^2)\).</p>
+
+                        <br>
+                        <h3>References</h3>
+                        <p>
+                          [1] ~\cite{murtagh}
+                          [2] ~\cite{Murtagh85}
+                          [3] ~\cite{Murtagh84}
+                          [4] ~\cite{Anderberg}
+                          [5] ~\cite{sneath75}
+                          [6] ~\cite{jain88}
+                          [7] ~\cite{BeckBryman}
+                          [8] ~\cite{ward}
+                          [9] ~\cite{LanceWilliams}
+                          [10] ~\cite{SAD_1977__2_3_24_0}
+                          [11] ~\cite{mull}
+                          [12] ~\cite{ackerman2012weighted}
+                          [13] ~\cite{bt_ds}
+                          [14] ~\cite{greene06icml}
+                          [15] ~\cite{wine_quality}
+                          [16] ~\cite{calihouse}
+                          [17] ~\cite{lecun2010mnist}
+                          [18] ~\cite{fmnist}
+                          [19] ~\cite{misc_adult_2}
+                          [20] ~\cite{bike_ds}
+                          [21] ~\cite{scipylinkage}
+                        </p>
                 </div>
             </div>
         </section>
@@ -76,7 +509,7 @@
   
 </head>
 <body>
-  <h2>Inline LaTeX: \( a^2 + b^2 = c^2 \)</h2>
+  <h2>Inline LaTeX:  \( a^2 + b^2 = c^2 \)</h2>
   
   <h2>Block LaTeX:</h2>
   <p>
