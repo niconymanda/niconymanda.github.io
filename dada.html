@@ -43,17 +43,21 @@
                     <br>
                     Current state-of-the-art systems are typically benchmarked on the ASVspoof dataset~\cite{ASVspoof_21}, which comprises scripted recordings and spoofs generated using predefined synthesis techniques. A new dataset, In The Wild~\cite{in_the_wild}, was released recently to 
                     better reflect the actual landscape of deepfake generation. This dataset contains real-world recordings and spoofs generated using a variety of techniques, including voice conversion and text-to-speech. Any deepfake countermeasure system therefore needs to be
-                    evaluated on both ASVspoof and In The Wild to assess its robustness in detecting real-world deepfakes. In particular, we are interested in assessing how models trained on ASVspoof transfer to In The Wild. 
+                    evaluated on both ASVspoof and In The Wild to assess its robustness in detecting real-world deepfakes. In particular, we are interested in assessing how models trained on ASVspoof transfer to In The Wild. </p>
                     <br>
-                    \begin{figure}[t]\textbf{}
+                    <!-- \begin{figure}[t]\textbf{}
                     \centering
                     \includegraphics[width=.95\columnwidth,trim={3.5em, 1em, 4em, 2em}]{figures/overview.pdf}
                     \caption{Overview of the DADA pipeline. Audio files are first transcribed to obtain textual content. Features are then extracted from both the speech and text using separate models. Finally, these features are combined (using either mid fusion or late fusion strategies) to generate the final prediction.}\label{fig:overview}
                     \vspace{-\baselineskip}
-                    \end{figure}
-                    <br>
+                    \end{figure} -->
+                    <figure class="centre-figure" style="width: 50%;">
+                        <img src="images/dada/overview.png">
+                        <figcaption><strong>Figure 1:</strong> Overview of the DADA pipeline. Audio files are first transcribed to obtain textual content. Features are then extracted from both the speech and text using separate models. Finally, these features are combined (using either mid fusion or late fusion strategies) to generate the final prediction.</figcaption>
+                    </figure>
+                    <p><br>
                     Aiming to increase robustness in deepfake detection, we propose a new pipeline that incorporates contextual information. Deepfakes can be leveraged to misattribute quotes to public figures. While a deepfake detector focused on audio might fail to find the spoof, a human would consider the mismatch between the content of the 
-                    speech and the public figure's otherwise well-known opinion. Our approach, named Defence Against the Deepfake Arts (DADA) and summarized in Figure~\ref{fig:overview}, takes this intuition into account to propose a pre-training objective for deepfake detection. We augment an audio-based deepfake classifier with an authorship 
+                    speech and the public figure's otherwise well-known opinion. Our approach, named Defence Against the Deepfake Arts (DADA) and summarized in Figure 1, takes this intuition into account to propose a pre-training objective for deepfake detection. We augment an audio-based deepfake classifier with an authorship 
                     attribution model. The latter learns to map the speech transcript to the most likely author. A final classification layer detects discrepancies between the audio-based embedding~--- trained to represent the speaker's features~--- and the text-based embedding~--- trained to represent the author of the speech's content.
                     <br>
                     Deepfake generation methods broadly fall into 6 categories~\cite{review_audio_deepfake_issues}, any of which may be used to create deepfakes of public figures. The first approach is imitation-based (voice conversion), wherein the original audio signal is modified to mimic another target voice. This technique is mainly used in 
@@ -76,7 +80,7 @@
                     <br>
                     <h3>2. Method</h3>
                     <p> In this section, we present our proposed architecture, DADA. It combines the traditional method of analyzing the audio of the speech sample, with contextual information extracted from the sample. Specifically, our approach seeks to determine not only whether a speech sample is a deepfake, but also the likelihood of the supposed 
-                    speaker having made the given statement, thus embedding contextual awareness into the detection pipeline. An overview of the pipeline is shown in Figure~\ref{fig:overview}.
+                    speaker having made the given statement, thus embedding contextual awareness into the detection pipeline. An overview of the pipeline is shown in Figure 1.
                     <br>
                     Our method operates in three stages: transcription, feature extraction, and fusion. First, the audio files are transcribed using Whisper~\cite{radford2023robust} to obtain the textual content. Manual inspection has shown that those transcriptions are highly accurate, whether speech is real or machine-generated. Following transcription, 
                     the architecture leverages two models trained independently: a text and a speech model, with the goal of learning speaker and author representations, respectively. The extracted speech and text features are then combined using one of two fusion strategies to obtain the final classification score.
@@ -116,33 +120,42 @@
                     \end{split}
                     \end{align}
                     <br>
-                    In the final stage, we set the margin to the final margin obtained from the adaptive stage, $\lambda_{f}$, and train the model for a few more epochs to achieve optimal performance.
+                    In the final stage, we set the margin to the final margin obtained from the adaptive stage, $\lambda_{f}$, and train the model for a few more epochs to achieve optimal performance. </p>
                     <br>
                     <br>
-                    <b>2.3 Fusion Strategies.</b>
+                    <p><b>2.3 Fusion Strategies.</b></p>
                     <br>
-                    \begin{figure}[t!]
+                    <!-- \begin{figure}[t!]
                     \centering
                     \includegraphics[width=0.95\columnwidth]{figures/mid_fusion_small_fin.pdf}
                     \caption{Pipeline for Mid Fusion. Features from the text and speech modules are concatenated and passed through an MLP to produce the final classification.}\label{fig:mid_fusion}
-                    \end{figure}
+                    \end{figure} -->
+
+                    <figure class="centre-figure" style="width: 50%;">
+                        <img src="images/dada/mid_fusion_small_fin.png">
+                        <figcaption><strong>Figure 2:</strong> Pipeline for Mid Fusion. Features from the text and speech modules are concatenated and passed through an MLP to produce the final classification.</figcaption>
+                    </figure>
                     <br>
-                    \begin{figure}[t!]
+                    <figure class="centre-figure" style="width: 50%;">
+                        <img src="images/dada/late_fusion_small_fin.png">
+                        <figcaption><strong>Figure 3:</strong> Pipeline for Late Fusion. Predictions from the speech and text models are combined using a weighted mean to produce the final classification.</figcaption>
+                    </figure>
+                    <!-- \begin{figure}[t!]
                     \centering
                     \includegraphics[width=0.95\columnwidth]{figures/late_fusion_small_fin.pdf}
                     \caption{Pipeline for Late Fusion. Predictions from the speech and text models are combined using a weighted mean to produce the final classification.}\label{fig:late_fusion}
                     \vspace{-\baselineskip}
-                    \end{figure}
+                    \end{figure} -->
                     <br>
-                    After independently training the speech and text models, we freeze their parameters and combine their features using one of two fusion strategies: mid fusion or late fusion.
+                    <p>After independently training the speech and text models, we freeze their parameters and combine their features using one of two fusion strategies: mid fusion or late fusion.
                     <br>
                     <b>2.3.1 Mid Fusion.</b>
-                    In mid fusion (Figure~\ref{fig:mid_fusion}), the extracted features from the speech and text models are concatenated to create a joint representation. This combined representation is then passed through a Multi-Layer Perceptron (MLP). The MLP is trained on annotated examples of deepfake and bonafide speech and then learns to integrate the speech and 
+                    In mid fusion (Figure 2), the extracted features from the speech and text models are concatenated to create a joint representation. This combined representation is then passed through a Multi-Layer Perceptron (MLP). The MLP is trained on annotated examples of deepfake and bonafide speech and then learns to integrate the speech and 
                     text features effectively to make a final prediction. The training of the MLP is guided by the Binary Cross-Entropy loss.
                     <br>
                     <b>2.3.2 Late Fusion.</b>
                     In this approach, the speech and text models are treated as independent branches. Each produces its own prediction score. We formulate this fusion strategy for the scenario where there exists a purported speaker, consistent with deepfakes for a specific individual or public figure. We add a binary classification head to both the speech and text models. 
-                    The text model outputs the probability of the anticipated speaker having made the given statement, while the speech model predicts the likelihood of the speech being real or fake. The final prediction is obtained by taking the weighted mean of the scores from the two branches, as shown in Figure~\ref{fig:late_fusion}. This simple averaging method ensures 
+                    The text model outputs the probability of the anticipated speaker having made the given statement, while the speech model predicts the likelihood of the speech being real or fake. The final prediction is obtained by taking the weighted mean of the scores from the two branches, as shown in Figure 3. This simple averaging method ensures 
                     that the final decision benefits from the independent contributions of both modalities while maintaining the interpretability of individual scores. Formally, the final prediction is obtained as follows:
                     <br>
                     \begin{align}
@@ -168,9 +181,28 @@
                     two different authors) and $X$ is from one of the two categories (in this case, a third quote, from one of the two previous authors). The task is to determine whether $X$ and $A$ are from the same author, or whether $X$ and $B$ are. This is done by implementing a decision rule based on the learned embeddings: if 
                     $d{(f_\theta (X),f_\theta(A)) < d(f_\theta(X),f_\theta(B))}$ then $A$, else $B$. The accuracy measures the percentage of times the model correctly assigns $X$ to its corresponding label (closer to $A$ or $B$). A random decision rule would yield 50\% accuracy.
                     <br>
-                    <b>3.1.3 Benchmarking.</b>
+                    <b>3.1.3 Benchmarking.</b></p>
+                    <table  class="data-table">
+                        <caption>
+                            Table 1: ABX accuracy of text models (in \%) fine-tuned on Wikiquotes and VoxCeleb2~\cite{voxceleb2}, on the validation sets. The parameter $\lambda$ denotes the margin used in Eq.~\ref{eq:triplet_loss}.
+                        </caption>
+                        <thead>
+                            <tr>
+                            <th><strong>Model</strong></th>
+                            <th><strong>$\lambda$</strong></th>
+                            <th><strong>Wikiquotes</strong></th>
+                            <th><strong>VoxCeleb2</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>T5 Encoder~\cite{t5}</td><td>0.44</td><td>77.6</td><td>76.8</td></tr>
+                            <tr><td>Flan-T5 Encoder~\cite{flan-t5}</td><td>0.35</td><td>76.0</td><td>75.3</td></tr>
+                            <tr><td>ModernBERT~\cite{modernBERT}</td><td>0.50</td><td>81.0</td><td>70.0</td></tr>
+                            <tr><td>DeBERTa~\cite{deberta}</td><td>0.50</td><td>84.1</td><td>86.5</td></tr>
+                        </tbody>
+                    </table>
                     
-                        \begin{table}[!t]\centering
+                        <!-- \begin{table}[!t]\centering
                           \caption{ABX accuracy of text models (in \%) fine-tuned on Wikiquotes and VoxCeleb2~\cite{voxceleb2}, on the validation sets. The parameter $\lambda$ denotes the margin used in Eq.~\ref{eq:triplet_loss}.}
                           \label{tab:results_text_model}
                           \scriptsize
@@ -182,11 +214,11 @@
                             0.50                         & \textbf{84.1} & \textbf{86.5}             \\\bottomrule
                           \end{tabular}
                         \vspace{-\baselineskip}
-                        \end{table}
-                    <br>
+                        \end{table} -->
+                    <p><br>
                     We benchmark the text model using state-of-the-art encoder-only architectures: DeBERTa~\cite{deberta}, ModernBERT~\cite{modernBERT}, and the encoder of T5~\cite{t5} and Flan-T5~\cite{flan-t5}. Encoder-only models are well-suited for authorship attribution as they generate fixed-size representations, capturing stylistic patterns and semantic coherence. To identify 
-                    the most effective architecture, we fine-tuned each model using Ray Tune~\cite{liaw:tune}, optimizing the triplet loss margin $\lambda$ (second column in Table~\ref{tab:results_text_model}), the number of hidden layers for feature extraction and the number of fully connected layers after the aggregated features. These numbers differ from model to model, but for the 
-                    best-performing model DeBERTa-v3-large, optimal results were achieved using only the last hidden layer, a two-layer MLP with dropout rate of 0.2, and a 512-dimensional feature output. All experiments were conducted on a single NVIDIA A100 GPU with 40GB vRAM. The results of the text model can be found in Table~\ref{tab:results_text_model}, and show that the learned 
+                    the most effective architecture, we fine-tuned each model using Ray Tune~\cite{liaw:tune}, optimizing the triplet loss margin $\lambda$ (second column in Table 1), the number of hidden layers for feature extraction and the number of fully connected layers after the aggregated features. These numbers differ from model to model, but for the 
+                    best-performing model DeBERTa-v3-large, optimal results were achieved using only the last hidden layer, a two-layer MLP with dropout rate of 0.2, and a 512-dimensional feature output. All experiments were conducted on a single NVIDIA A100 GPU with 40GB vRAM. The results of the text model can be found in Table 1, and show that the learned 
                     representations distinguish authors effectively.
                     <br>
                     <br>
@@ -207,8 +239,59 @@
                     
                     <br>
                     <h3>4. Results</h3>
+                    <table style="width:100%; border-collapse: collapse; font-size: 12px;">
+                        <caption style="caption-side: top; text-align: left; font-weight: bold; margin-bottom: 8px;">
+                          Performance (in %) of DADA compared to state-of-the-art baselines. Our mid fusion strategy outperforms all baselines on ASV Spoof 21 and achieves minimum EER for In The Wild and MLAAD[en].
+                        </caption>
+                        <thead>
+                          <tr>
+                            <th rowspan="2" style="border-bottom: 1px solid #000;">Method</th>
+                            <th colspan="2">ASVspoof21</th>
+                            <th colspan="2">In The Wild</th>
+                            <th colspan="2">MLAAD[en]</th>
+                          </tr>
+                          <tr>
+                            <th style="border-bottom: 1px solid #000;">F1 ↑</th>
+                            <th style="border-bottom: 1px solid #000;">EER ↓</th>
+                            <th style="border-bottom: 1px solid #000;">F1 ↑</th>
+                            <th style="border-bottom: 1px solid #000;">EER ↓</th>
+                            <th style="border-bottom: 1px solid #000;">F1 ↑</th>
+                            <th style="border-bottom: 1px solid #000;">EER ↓</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>LCNN</td><td>19.7</td><td>25.5</td><td>37.3</td><td>65.6</td><td>65.4</td><td>37.2</td>
+                          </tr>
+                          <tr>
+                            <td>Rawnet2</td><td>21.3</td><td>22.3</td><td>60.2</td><td>37.8</td><td>67.6</td><td>33.9</td>
+                          </tr>
+                          <tr>
+                            <td>SLIM</td><td>65.1</td><td>4.4</td><td>89.8</td><td>12.5</td><td>89.2</td><td>10.7</td>
+                          </tr>
+                          <tr>
+                            <td>AASIST</td><td>70.7</td><td>3.6</td><td>84.7</td><td>17.5</td><td>85.6</td><td>14.5</td>
+                          </tr>
+                          <tr>
+                            <td colspan="7" style="font-weight: bold; border-bottom: 1px solid #000;">DADA Variants (Ours)</td>
+                          </tr>
+                          <tr>
+                            <td>Text-Only</td><td>0.8</td><td>46.1</td><td>0.6</td><td>47.7</td><td>0.0</td><td>50.1</td>
+                          </tr>
+                          <tr>
+                            <td>Speech-Only</td><td>89.6</td><td>3.1</td><td>68.6</td><td>13.8</td><td>75.4</td><td>15.3</td>
+                          </tr>
+                          <tr>
+                            <td>Late Fusion</td><td>89.2</td><td>2.9</td><td>70.1</td><td>13.3</td><td>84.0</td><td>14.8</td>
+                          </tr>
+                          <tr style="font-weight: bold;">
+                            <td>Mid Fusion</td><td>91.0</td><td>2.7</td><td>72.1</td><td>11.8</td><td>79.7</td><td>9.8</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      
                     <p>
-                        \begin{table}[t]\centering
+                        <!-- \begin{table}[t]\centering
                         \caption{Performance (in \%) of DADA compared to state-of-the-art baselines.
                             Our mid fusion strategy outperforms all baselines on ASV Spoof 21 and achieves minimum EER for In The Wild and MLAAD[en].}\label{tab:global_results}
                         \scriptsize
@@ -228,9 +311,9 @@
                             \\ \bottomrule
                         \end{tabular}
                         \vspace{-\baselineskip}
-                        \end{table}
+                        \end{table} -->
                     <br>
-                    Our results can be found in Table~\ref{tab:global_results}.
+                    Our results can be found in Table 2.
                     <br>
                     We consider four variants of our method for comparison and ablations: text-only, speech-only, late fusion, and mid fusion. The text-only model predicts the same label, \verb|spoof|, regardless of the input, leading to infinitesmal F1 scores. This is expected, since the text modality entirely lacks the necessary information to make accurate predictions. The speech-only model 
                     outperforms baselines on ASVspoof and is competitive on the other two datasets. Interestingly, this is achieved with pre-training focused exclusively on speaker identification. Our speaker representations nonetheless contain relevant information for deepfake detection, as they achieve non-trivial performance. The late fusion strategy performs slightly better than the 
