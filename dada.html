@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nicoline Nymand-Andersen</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        <img src="images/Portrait.PNG">
+        <br>
+        <h1>Nicoline Rosa Westrin Nymand-Andersen</h1>
+        <h2 style="font-size: 19px;color:#494949;">M.Sc. Computer Science and M.Sc. Artificial Intelligence</h2>
+    </header>
+
+    <main>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+        </script>
+        <section class="about"  style="padding-left: 15%; padding-right: 15%;">
+            <div class="box-container">
+                <div class="info-box">
+                    <h2>Defence Against the Deepfake Arts: Improving Audio Deepfake Detection With Context Awareness</h2>
+                    <p style="text-align: center;">Abhay Mathur, Ivanina Ivanova, Nicoline Rosa Westrin Nymand-Andersen, Nils Holzenberger</p>
+                    <br>
+                    <p>
+                        <b>Abstract.</b> The increasing use of generative AI models to create realistic deepfakes poses significant challenges to information security, particularly in the realm of audio manipulation. Current audio deepfake detection methods focus on the 
+                        acoustic signal and learn to spot artifacts produced by specific deepfake generators. This makes them inherently brittle when deployed to real-world datasets. We start from the intuitive observation that, in audio deepfakes, the person heard on 
+                        the recording did not author the content of the utterance. This leads us to leverage speaker and author representations for speech and text. We introduce a novel multimodal approach, Defence Against the Deepfake Arts (DADA), involving two 
+                        independent models for speech and text trained using contrastive learning, which then feed into a classifier fine-tuned for deepfake detection. We show empirically how our method robustly transfers to multiple methods of deepfake generation, 
+                        setting a new state-of-the-art on the EER metric on multiple benchmarks.
+                    </p>
+                    <br>
+                    <h3>1. Introduction</h3>
+                    <p>Highly realistic AI-generated content such as images, audio, and even videos can be created with open-source software~\cite{liu23deepfacelab}. Audio deepfakes use deep learning techniques to create voices that convincingly impersonate real people~\cite{adversarial}. 
+                    Distinguishing fake from real media becomes nearly impossible for the ordinary user. Deepfakes thus affect a range of domains, from political discourse to personal security. These deepfakes are not only used in creating political propaganda to manipulate 
+                    public opinion~\cite{stuanescuinformational} but have also become tools for conducting phone scams~\cite{mirsky2022dfcaptcha}, posing significant threats to individual privacy and security. Yet robust detection mechanisms are still lacking~\cite{in_the_wild}. This 
+                    paper contributes to proactive measures in detecting audio deepfakes, focusing on public figures. Public figures are especially susceptible to the detrimental effects of audio deepfakes as their extensive online presence renders them prime targets for malicious 
+                    actors seeking to disseminate misinformation.
+                    <br>
+                    Current state-of-the-art systems are typically benchmarked on the ASVspoof dataset~\cite{ASVspoof_21}, which comprises scripted recordings and spoofs generated using predefined synthesis techniques. A new dataset, In The Wild~\cite{in_the_wild}, was released recently to 
+                    better reflect the actual landscape of deepfake generation. This dataset contains real-world recordings and spoofs generated using a variety of techniques, including voice conversion and text-to-speech. Any deepfake countermeasure system therefore needs to be
+                    evaluated on both ASVspoof and In The Wild to assess its robustness in detecting real-world deepfakes. In particular, we are interested in assessing how models trained on ASVspoof transfer to In The Wild. 
+                    <br>
+                    \begin{figure}[t]\textbf{}
+                    \centering
+                    \includegraphics[width=.95\columnwidth,trim={3.5em, 1em, 4em, 2em}]{figures/overview.pdf}
+                    \caption{Overview of the DADA pipeline. Audio files are first transcribed to obtain textual content. Features are then extracted from both the speech and text using separate models. Finally, these features are combined (using either mid fusion or late fusion strategies) to generate the final prediction.}\label{fig:overview}
+                    \vspace{-\baselineskip}
+                    \end{figure}
+                    <br>
+                    Aiming to increase robustness in deepfake detection, we propose a new pipeline that incorporates contextual information. Deepfakes can be leveraged to misattribute quotes to public figures. While a deepfake detector focused on audio might fail to find the spoof, a human would consider the mismatch between the content of the 
+                    speech and the public figure's otherwise well-known opinion. Our approach, named Defence Against the Deepfake Arts (DADA) and summarized in Figure~\ref{fig:overview}, takes this intuition into account to propose a pre-training objective for deepfake detection. We augment an audio-based deepfake classifier with an authorship 
+                    attribution model. The latter learns to map the speech transcript to the most likely author. A final classification layer detects discrepancies between the audio-based embedding~--- trained to represent the speaker's features~--- and the text-based embedding~--- trained to represent the author of the speech's content.
+                    <br>
+                    Deepfake generation methods broadly fall into 6 categories~\cite{review_audio_deepfake_issues}, any of which may be used to create deepfakes of public figures. The first approach is imitation-based (voice conversion), wherein the original audio signal is modified to mimic another target voice. This technique is mainly used in 
+                    show business and, therefore, is applied by a third person or deep learning software. The second approach is synthetic-based, producing artificially generated speech using text-to-speech techniques. This process involves three stages: text analysis, acoustic, and vocoder. The third technique is centred on replaying existing 
+                    recordings of the target speaker. Two techniques are notable here: cut-and-paste detection, where a victim's recorded segment is played through a phone handset for capture, and far-field detection, which involves crafting sentences for manipulation of a text-dependent system. Emotion fake alters the emotions of a speaker's 
+                    voice while preserving the original words and speaker identity~\cite{zhao2023emofake}. Scene fake involves modifying the background sounds of a recording, leaving the speaker and content untouched~\cite{yi2022scenefake}. Finally, partial fakes involve replacing specific words within the original audio signal with either real 
+                    or synthetic audio segments. The speaker remains the same throughout, but the content is altered~\cite{yi2023halftruth}.
+                    <br> 
+                    Current automated deepfake detection methods typically use deep learning, and achieve high performance on benchmarks~\cite{ASVspoof_21,zeng2023deepfake}. Lightweight Convolutional Neural Networks~(LCNN)~\cite{lfcc_lcnn} have been widely employed due to their efficiency in capturing spoofing artefacts in raw waveforms. 
+                    RawNet2~\cite{rawnet2}, a variant of RawNet, leverages residual connections and attention mechanisms to improve feature extraction for deepfake detection. AASIST~(Audio Anti-Spoofing using Integrated Spectro-Temporal features)~\cite{aasist} integrates spectro-temporal representations to enhance robustness against unseen attacks. 
+                    RawGAT~\cite{rawgat}, a model combining raw waveform processing with Graph Attention Networks, has shown promising results in handling diverse spoofing techniques. More recently, and closer to our proposed approach, SLIM (Style-Linguistics Mismatch Model)~\cite{slim} aims to leverage the mismatch between a speaker's style and 
+                    linguistic content through self-supervised pretraining on real speech, to detect spoofing. We take an alternative approach, and focus solely on the identity of the speaker. We train author-attribution and speaker-identification models independently, and show how this information is sufficient to achieve competitive performance, 
+                    with a new state-of-the-art on three evaluation benchmarks.
+                    <br>
+                    Recent advancements in authorship attribution using deep learning have showcased the effectiveness of various encoder-based architectures in capturing linguistic and stylistic patterns unique to individual authors. Multiple works explore BERT or T5-based models to identify authorship in literary texts, achieving notable accuracy~\cite{hicke2023t5,silva2024forged}. 
+                    For instance, BertAA~\cite{fabien2020bertaa} is a fine-tuned pretrained BERT model for authorship attribution, demonstrating competitive performance on multiple datasets. Author identification framed as a classification problem for identifying authors of arXiv manuscripts has also been shown to achieve high attribution accuracy on 
+                    a large-scale dataset with up to 2,000 authors~\cite{bauersfeld2023cracking}. Further, several methods use techniques from contrastive learning in creating discriminative embedding spaces~\cite{hu2020deepstyle} for short-text authorship attribution at scale, by leveraging triplet loss and Siamese networks~\cite{saedi2021siamese}, 
+                    outperforming existing baselines on Twitter and Weibo datasets.</p>
+
+                    <br>
+                    <h3>2. Method</h3>
+                    <p> In this section, we present our proposed architecture, DADA. It combines the traditional method of analyzing the audio of the speech sample, with contextual information extracted from the sample. Specifically, our approach seeks to determine not only whether a speech sample is a deepfake, but also the likelihood of the supposed 
+                    speaker having made the given statement, thus embedding contextual awareness into the detection pipeline. An overview of the pipeline is shown in Figure~\ref{fig:overview}.
+                    <br>
+                    Our method operates in three stages: transcription, feature extraction, and fusion. First, the audio files are transcribed using Whisper~\cite{radford2023robust} to obtain the textual content. Manual inspection has shown that those transcriptions are highly accurate, whether speech is real or machine-generated. Following transcription, 
+                    the architecture leverages two models trained independently: a text and a speech model, with the goal of learning speaker and author representations, respectively. The extracted speech and text features are then combined using one of two fusion strategies to obtain the final classification score.
+                    <br>
+                    <br>
+                    <b>2.1 Text Model.</b>
+                    The main idea of the text model is to connect the textual surface form of the utterance with possible authorship. To do this, we fine-tune a pretrained encoder-based LLM for authorship attribution. To improve the model's ability to take into account stylistic and linguistic patterns unique to specific authors, we extracted the features 
+                    from the last $l$ hidden states of the encoder, instead of only the \verb|CLS| token. Transformer models encode information hierarchically across layers. The lower layers capture phrase-level or segment-level interactions, where the intermediate layers represent syntactic information like grammar and vocabulary, and the higher layers 
+                    encode semantic information. By using multiple layers we aim to capture a broader spectrum of features, combining syntactic and semantic information~\cite{jawahar2019does}. The extracted features are aggregated across sub-word units using a mean-pooling layer. This vector is passed to several fully-connected layers. To model the space 
+                    of authors effectively and identify the characteristics of their speech, we employ techniques from contrastive learning, in this case triplet loss. This loss function helps create a well-defined embedding space, where texts attributed to the same author are closer together, while those from different authors are further apart~\cite{mao2019metric}. 
+                    The function is defined using triplets $(A,P,N)$, where $A$ is a randomly sampled anchor (reference point), $P$ is a positive sample that has the same label as $A$, and $N$ is the negative sample of a different random class than the anchor. Here, we use authors as labels, so that $A$ and $P$ are quotes sharing the same author, and $N$ 
+                    is a quote from a different author. The goal is to ensure that the distance between $A$ and $P$ is smaller than the distance between $A$ and $N$ by at least a certain margin $\lambda$. We define the loss function as follows:
+                    <br>
+                    \begin{align}
+                    \mathcal{L} = [d(f_\theta^{A},f_\theta^{P}) - d(f_\theta^{A},f_\theta^{N}) + \lambda]_{+}
+                    \label{eq:triplet_loss}
+                    \end{align}
+                    <br>
+                    where $f_\theta(x)$ is the embedding of string $x$ generated by the model, $\lambda$ is the margin that enforces a minimum separation between similar and dissimilar pairs, $d(.,.)$ is the distance between the two embeddings, and $[\cdot]_{+} = \max(\cdot, 0)$. We experiment with two different distance functions, squared Euclidean distance (L2-norm) 
+                    and cosine (dis)similarity.
+                    <br>
+                    <br>
+                    <b>2.2 Speech Model.</b>
+                    The speech model uses a Wav2Vec2~\cite{wav2vec2} backbone for feature extraction, which allows extracting representations directly from raw audio waveforms. To capture a comprehensive set of features, multiple layers from the model are pooled into a single feature vector. This pooling is achieved using a compression module that employs attentive mean 
+                    pooling, permitting the model to focus on the most informative parts of the audio signal. Additionally, following~\cite{slim}, a non-linear bottleneck is applied to refine the feature vector, ensuring that it captures the essential characteristics needed for accurate deepfake detection.
+                    <br>
+                    Similar to the text module, speech features (denoted as $f_{\phi}$) are trained using contrastive learning, with a triplet loss as in Equation~\ref{eq:triplet_loss}, using cosine distance. The $(A, P, N)$ triplets follow the same structure as the text module: $A$ and $P$ are speech samples from the same speaker, while $N$ is a speech sample from a 
+                    different speaker. To optimize the margin used in the triplet loss function, we employ an iterative process that involves three stages: initial training with a fixed margin, adaptive margin adjustment, and final training with a fixed margin.
+                    <br>
+                    In the first stage, we train the model for a few epochs using a margin $\lambda_0$, fixed a priori. This initial training helps achieve some separation between classes and provides a good starting point for further optimization. Next, we train the model for some additional epochs using the adaptive triplet loss introduced in~\cite{adatriplet}. This 
+                    adds an additional soft constraint on the virtual angle between the anchor and the negative sample using another margin $\lambda'$ as follows:
+                    <br>
+                    \begin{align}
+                    \begin{split}
+                        \mathcal{L}_{ada} & = [d(f_\phi^{A},f_\phi^{P}) - d(f_\phi^{A},f_\phi^{N})+ \lambda]_{+} \\
+                                        & + [\lambda' - d(f_\phi^{A},f_\phi^{N})]_{+}
+                    \end{split}
+                    \end{align}
+                    <br>
+                    In the final stage, we set the margin to the final margin obtained from the adaptive stage, $\lambda_{f}$, and train the model for a few more epochs to achieve optimal performance.
+                    <br>
+                    <br>
+                    <b>2.3 Fusion Strategies.</b>
+                    <br>
+                    \begin{figure}[t!]
+                    \centering
+                    \includegraphics[width=0.95\columnwidth]{figures/mid_fusion_small_fin.pdf}
+                    \caption{Pipeline for Mid Fusion. Features from the text and speech modules are concatenated and passed through an MLP to produce the final classification.}\label{fig:mid_fusion}
+                    \end{figure}
+                    <br>
+                    \begin{figure}[t!]
+                    \centering
+                    \includegraphics[width=0.95\columnwidth]{figures/late_fusion_small_fin.pdf}
+                    \caption{Pipeline for Late Fusion. Predictions from the speech and text models are combined using a weighted mean to produce the final classification.}\label{fig:late_fusion}
+                    \vspace{-\baselineskip}
+                    \end{figure}
+                    <br>
+                    After independently training the speech and text models, we freeze their parameters and combine their features using one of two fusion strategies: mid fusion or late fusion.
+                    <br>
+                    <b>2.3.1 Mid Fusion.</b>
+                    In mid fusion (Figure~\ref{fig:mid_fusion}), the extracted features from the speech and text models are concatenated to create a joint representation. This combined representation is then passed through a Multi-Layer Perceptron (MLP). The MLP is trained on annotated examples of deepfake and bonafide speech and then learns to integrate the speech and 
+                    text features effectively to make a final prediction. The training of the MLP is guided by the Binary Cross-Entropy loss.
+                    <br>
+                    <b>2.3.2 Late Fusion.</b>
+                    In this approach, the speech and text models are treated as independent branches. Each produces its own prediction score. We formulate this fusion strategy for the scenario where there exists a purported speaker, consistent with deepfakes for a specific individual or public figure. We add a binary classification head to both the speech and text models. 
+                    The text model outputs the probability of the anticipated speaker having made the given statement, while the speech model predicts the likelihood of the speech being real or fake. The final prediction is obtained by taking the weighted mean of the scores from the two branches, as shown in Figure~\ref{fig:late_fusion}. This simple averaging method ensures 
+                    that the final decision benefits from the independent contributions of both modalities while maintaining the interpretability of individual scores. Formally, the final prediction is obtained as follows:
+                    <br>
+                    \begin{align}
+                    \hat{y} & = \alpha \cdot p(\hat{y}|f_\phi) + (1-\alpha) \cdot p(\hat{y}|f_\theta)
+                    \end{align}
+                    <br>
+                    Where $p(\hat{y}|f_\phi)$ and $p(\hat{y}|f_\theta)$ are the predictions from the speech and text models respectively, and $\alpha$ is the weight assigned to the speech model's prediction.</p>
+                    
+
+                    <br>
+                    <h3>3. Experiments</h3>
+                    <p>
+                    <br>
+                    <b>3.1 Text Model.</b>
+                    <br>
+                    <b>3.1.1 Datasets.</b>
+                    For the authorship attribution task, we incorporate two datasets, Wikiquotes\footnote{\url{https://en.wikiquote.org/wiki/Main_Page}} and VoxCeleb2~\cite{voxceleb2}. Both of them provide a rich corpus of quotes from various authors. We filter Wikiquotes, a free online repository of sourced quotations from notable individuals, to retain only the 58 authors 
+                    present in the In The Wild dataset. The filtered dataset is then split into a development set (70\%) and a validation set (30\%), resulting in 5740 samples for development and 2461 for testing. VoxCeleb2, on the other hand, contains speeches from celebrities extracted from YouTube videos. We use a subset of the dataset, selecting 5,000 random samples for 
+                    training and 3,000 for testing and validation. This results in 256 unique authors in the training set and 343 in the validation set.
+                    <br>
+                    <b>3.1.2 Metrics.</b>
+                    ABX accuracy is a commonly used metric in speech and speaker representation learning, often used in tasks related to contrastive learning~\cite{abx_speech_features,evaluatingcontextinvarianceunsupervisedspeech}. Similar to triplet loss, we have three samples $A$, $B$ and $X$, where $A$ and $B$ are from two different categories (in this case, two quotes from 
+                    two different authors) and $X$ is from one of the two categories (in this case, a third quote, from one of the two previous authors). The task is to determine whether $X$ and $A$ are from the same author, or whether $X$ and $B$ are. This is done by implementing a decision rule based on the learned embeddings: if 
+                    $d{(f_\theta (X),f_\theta(A)) < d(f_\theta(X),f_\theta(B))}$ then $A$, else $B$. The accuracy measures the percentage of times the model correctly assigns $X$ to its corresponding label (closer to $A$ or $B$). A random decision rule would yield 50\% accuracy.
+                    <br>
+                    <b>3.1.3 Benchmarking.</b>
+                    
+                        \begin{table}[!t]\centering
+                          \caption{ABX accuracy of text models (in \%) fine-tuned on Wikiquotes and VoxCeleb2~\cite{voxceleb2}, on the validation sets. The parameter $\lambda$ denotes the margin used in Eq.~\ref{eq:triplet_loss}.}
+                          \label{tab:results_text_model}
+                          \scriptsize
+                          \begin{tabular}{ccccc}\toprule
+                            % \multirow{2}{*}{Model}       & \multicolumn{2}{c}{Hyperparameters} & \multirow{2}{*}{WikiQuotes} &  \multirow{2}{*}{VoxCeleb2}   &  \multirow{2}{*}{In The Wild} \\\cmidrule{2-3}
+                            Model                        & $\lambda$     & Wikiquotes    & VoxCeleb2 \\ \midrule T5 Encoder~\cite{t5} &
+                            0.44                         & 77.6          & 76.8                      \\ Flan-T5 Encoder~\cite{flan-t5} & 0.35 & 76.0 & 75.3 \\
+                            ModernBERT~\cite{modernBERT} & 0.50          & 81.0          & 70.0      \\ DeBERTa~\cite{deberta} &
+                            0.50                         & \textbf{84.1} & \textbf{86.5}             \\\bottomrule
+                          \end{tabular}
+                        \vspace{-\baselineskip}
+                        \end{table}
+                    <br>
+                    We benchmark the text model using state-of-the-art encoder-only architectures: DeBERTa~\cite{deberta}, ModernBERT~\cite{modernBERT}, and the encoder of T5~\cite{t5} and Flan-T5~\cite{flan-t5}. Encoder-only models are well-suited for authorship attribution as they generate fixed-size representations, capturing stylistic patterns and semantic coherence. To identify 
+                    the most effective architecture, we fine-tuned each model using Ray Tune~\cite{liaw:tune}, optimizing the triplet loss margin $\lambda$ (second column in Table~\ref{tab:results_text_model}), the number of hidden layers for feature extraction and the number of fully connected layers after the aggregated features. These numbers differ from model to model, but for the 
+                    best-performing model DeBERTa-v3-large, optimal results were achieved using only the last hidden layer, a two-layer MLP with dropout rate of 0.2, and a 512-dimensional feature output. All experiments were conducted on a single NVIDIA A100 GPU with 40GB vRAM. The results of the text model can be found in Table~\ref{tab:results_text_model}, and show that the learned 
+                    representations distinguish authors effectively.
+                    <br>
+                    <br>
+                    <b>3.2 Speech Model.</b>
+                    The speech model is pre-trained on the speaker representation learning task~(Section~\ref{subsec:audio_model}) on an aggregation of the CommonVoice~\cite{commonvoice}, RAVDESS~\cite{ravdess} and VoxCeleb2~\cite{voxceleb2} datasets. Both CommonVoice and RAVDESS contain recordings of speakers reading predefined sentences. The aggregation contains 43 hours of real speech 
+                    data across 1067 speakers.
+                    <br>
+                    We train the model using the adaptive-margin, contrastive learning strategy described in Section~\ref{subsec:audio_model}, and evaluate its performance with ABX accuracy. Out best model achieves an ABX accuracy of 92\% on the aggregation.
+                    <br>
+                    <br>
+                    <b>3.3 Deepfake Detection.</b>
+                    We further fine-tune both our fusion pipelines on the Logical Access (LA) subset of the ASVspoof 2019 Dataset~\cite{ASVspoof_21}. This dataset contains a variety of real and spoofed speech samples designed to benchmark the performance of automatic speaker verification systems against spoofing attacks. We then evaluate the models' performance on the Deepfake (DF) subset 
+                    of ASVspoof 2021, which contains spoofs generated from more sophisticated systems, and two out-of-domain datasets, In The Wild~\cite{in_the_wild} and the English subset of MLAAD~\cite{mlaad}. This helps us assess its generalization and robustness to real-world deepfakes.
+                    <br>
+                    We consider two metrics for our evaluations: F1-score and Equal Error Rate (EER). EER is a standard metric for audio deepfake detection systems, denoting the point at which the false acceptance rate and the false rejection rate are equal. A lower EER indicates better performance. As compared to F1, EER accounts for a possible tuning of the detection threshold, which 
+                    would occur when deploying a deepfake detection system in practice.</p>
+                    
+                    
+                    <br>
+                    <h3>4. Results</h3>
+                    <p>
+                        \begin{table}[t]\centering
+                        \caption{Performance (in \%) of DADA compared to state-of-the-art baselines.
+                            Our mid fusion strategy outperforms all baselines on ASV Spoof 21 and achieves minimum EER for In The Wild and MLAAD[en].}\label{tab:global_results}
+                        \scriptsize
+                        \begin{tabular}{lcccccc}
+                            \toprule
+                            \multirow{2}{*}{Method} & \multicolumn{2}{c}{ASVspoof21} & \multicolumn{2}{c}{In The Wild} & \multicolumn{2}{c}{MLAAD[en]}                                                               \\\cmidrule{2-7}
+                                                    & F1~$\uparrow$                  & EER~$\downarrow$                & F1~$\uparrow$                 & EER~$\downarrow$ & F1~$\uparrow$  & EER~$\downarrow$        \\\cmidrule{1-7}
+                            LCNN~\cite{lfcc_lcnn}   & 19.7                           & 25.5                            & 37.3                          & 65.6             & 65.4           & 37.2                    \\
+                            Rawnet2~\cite{rawnet2}  & 21.3                           & 22.3                            & 60.2                          & 37.8             & 67.6           & 33.9                    \\
+                            SLIM~\cite{slim}        & 65.1                           & \phantom{0}4.4                  & 89.8                          & 12.5             & 89.2           & 10.7                    \\
+                            AASIST~\cite{aasist}    & 70.7                           & \phantom{0}3.6                  & 84.7                          & 17.5             & 85.6           & 14.5                    \\ \midrule
+                            \multicolumn{7}{l}{\textbf{DADA Variants (Ours)}}                                                                                                                                        \\
+                            Text-Only               & \phantom{0}0.8                 & 46.1                            & \phantom{0}0.6                & 47.7             & \phantom{0}0.0 & 50.1                    \\
+                            Speech-Only             & 89.6                           & \phantom{0}3.1                  & 68.6                          & 13.8             & 75.4           & 15.3                    \\
+                            Late Fusion             & 89.2                           & \phantom{0}2.9                  & 70.1                          & 13.3             & 84.0           & 14.8                    \\
+                            \textbf{Mid Fusion}     & \textbf{91.0}                  & \textbf{\phantom{0}2.7}         & 72.1                          & \textbf{11.8}    & 79.7           & \textbf{\phantom{0}9.8}
+                            \\ \bottomrule
+                        \end{tabular}
+                        \vspace{-\baselineskip}
+                        \end{table}
+                    <br>
+                    Our results can be found in Table~\ref{tab:global_results}.
+                    <br>
+                    We consider four variants of our method for comparison and ablations: text-only, speech-only, late fusion, and mid fusion. The text-only model predicts the same label, \verb|spoof|, regardless of the input, leading to infinitesmal F1 scores. This is expected, since the text modality entirely lacks the necessary information to make accurate predictions. The speech-only model 
+                    outperforms baselines on ASVspoof and is competitive on the other two datasets. Interestingly, this is achieved with pre-training focused exclusively on speaker identification. Our speaker representations nonetheless contain relevant information for deepfake detection, as they achieve non-trivial performance. The late fusion strategy performs slightly better than the 
+                    speech-only model, with the optimal text-module weight $\alpha = 0.61$, indicating that the text features provide relevant information but only marginal performance gains under this fusion strategy. The mid fusion model outperforms all DADA variants, achieving the highest F1 score on ASVspoof21 and the lowest EER across all datasets. Our best-performing mid fusion network 
+                    is an MLP with a single hidden layer with 256 units, a Batch Normalisation operation after the first linear projection and a dropout of 0.4. We observe a reduction of EER by 6.9\%, 5.6\% and 8.4\% on ASVspoof 2019, In The Wild and MLAAD, respectively.
+                    <br>
+                    Overall, these results support our motivating intuition: the speaker as identified by the audio, and the author as identified by the content of the speech utterance, are valuable pieces of information in detecting audio deepfakes, across deepfake generation methods. Relying solely on acoustic artefacts for deepfake detection is in fact a source of overfitting, as those artefacts 
+                    depend on the deepfake generation method. Incorporating context from transcripts is hence a method of reducing this over-reliance, by encouraging the deepfake detector to consider author information, as inferred from the content of the speech. SLIM makes a related but distinct assumption: that the audio signal carries information about the speaker and about the content of the speech, 
+                    and that deepfake generation manipulates one type of information while leaving the other unchanged. Both SLIM and DADA attain competitive performance on multiple benchmarks. Both approaches leverage comparable amounts of bonafide data for pre-training, reducing the need for labeled deepfakes. However, both the linguistic and stylistic encoders in SLIM must be trained jointly, while the 
+                    speech and text modules of DADA can be trained independently, on distinct data, as was done here. For deepfake detection, SLIM relies on learned style and linguistics embeddings, but also on the underlying speech encoder's features, whereas DADA only considers speaker and author embeddings.</p>
+
+
+                    <br>
+                    <h3>Conclusions</h3>
+                    <p>
+                    In this paper, we introduced DADA, a novel approach for audio deepfake detection that leverages both speech and textual features to improve detection accuracy. Speech and text features are learned independently, on real data, reducing the reliance on annotated deepfake data. Our experiments demonstrate that DADA outperforms the state-of-the-art on multiple datasets, highlighting the 
+                    potential of incorporating simple context awareness for robust deepfake detection. Future work will focus on further refining the fusion strategies and exploring additional datasets to validate the generalizability of our approach.
+                    </p>
+                    <br>
+                    <h3>References</h3>
+                    <p>
+                          [1] Murtagh, F., C.P.: Algorithms for hierarchical clustering: an overview. Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery (2012), https://doi.org/10.1002/widm.53
+                          <br>
+                          <br>
+                          [2] Murtagh, F.: Multidimensional clustering algorithms, Compstat Lectures, vol. 4. Physica-Verlag, Würzburg/Wien (1985), http://www.classification-society.org/csna/mda-sw/
+                          <br>
+                          <br>
+                          [3] Murtagh, F.: Complexities of hierarchic clustering algorithms: State of the art. Computational Statistics Quarterly 1 (01 1984)
+                          <br>
+                          <br>
+                          [4] Anderberg, M.R.: Chapter 6 - hierarchical clustering methods. In: Anderberg, M.R. (ed.) Cluster Analysis for Applications, pp. 131–155. Probability and Mathematical Statistics: A Series of Monographs and Textbooks, Academic Press (1973). https://doi.org/https://doi.org/10.1016/B978-0-12-057650-0.50012-0, https://www.sciencedirect.com/science/article/pii/B9780120576500500120
+                          <br>
+                          <br>
+                          [5] Sneath, P. H. A., S.R.R.: Numerical Taxonomy: The Principles and Practice of Numerical Classification, vol. 50. Williams WT published in association with Stony Brook University (1975). https://doi.org/https://doi.org/10.1086/408956
+                          <br>
+                          <br>
+                          [6] Jain, A. K., D.R.C.: Algorithms for Clustering Data. Prentice-Hall, Inc., Upper Saddle River, NJ (1988), http://dl.acm.org/citation.cfm?id=SERIES10022.42779
+                          <br>
+                          <br>
+                          [7] Lewis-Beck, M., Bryman, A., Futing Liao, T. (eds.): The SAGE Encyclopedia of Social Science Research Methods. SAGE Publishing, United States (2004). https://doi.org/10.4135/9781412950589
+                          <br>
+                          <br>
+                          [8] Ward, J.H.: Hierarchical grouping to optimize an objective function. Journal of the American statistical association (1963)
+                          <br>
+                          <br>
+                          [9] Lance, G.N., Williams, W.T.: A General Theory of Classificatory Sorting Strategies: 1. Hierarchical Systems. The Computer Journal 9(4), 373–380 (02 1967). https://doi.org/10.1093/comjnl/9.4.373, https://doi.org/10.1093/comjnl/9.4.373
+                          <br>
+                          <br>
+                          [10] Bruynooghe, M.: Méthodes nouvelles en classification automatique de données taxinomiques nombreuses. Statistique et analyse des données 2(3), 24–42 (1977), http://www.numdam.org/item/SAD_1977__2_3_24_0/
+                          <br>
+                          <br>
+                          [11] Müllner, D.: Modern hierarchical, agglomerative clustering algorithms. ArXiv abs/1109.2378 (2011), https://api.semanticscholar.org/CorpusID:8490224
+                          <br>
+                          <br>
+                          [12] Ackerman, M., Ben-David, S., Brânzei, S., Loker, D.: Weighted clustering. In: AAAI’12: Proceedings of the Twenty-Sixth AAAI Conference on Artificial Intelligence. AAAI Press (2012)
+                          <br>
+                          <br>
+                          [13] Yeh, I.C.: Blood Transfusion Service Center. UCI Machine Learning Repository (2008), DOI: https://doi.org/10.24432/C5GS39
+                          <br>
+                          <br>
+                          [14] Greene, D., Cunningham, P.: Practical solutions to the problem of diagonal dominance in kernel document clustering. In: Proc. 23rd International Conference on Machine learning (ICML’06). pp. 377–384. ACM Press (2006)
+                          <br>
+                          <br>
+                          [15] Cortez, P., Cerdeira, A., Almeida, F., Matos, T., Reis, J.: Wine Quality. UCI Machine Learning Repository (2009), DOI: https://doi.org/10.24432/C56S3T
+                          <br>
+                          <br>
+                          [16] elley Pace, R., Barry, R.: Sparse spatial autoregressions. Statistics Probability Letters 33(3), 291–297 (1997). https://doi.org/10.1016/S0167-7152(96)00140-X, https://www.sciencedirect.com/science/article/pii/S016771529600140X
+                          <br>
+                          <br>
+                          [17] LeCun, Y., Cortes, C., Burges, C.: Mnist handwritten digit database. ATT Labs [Online]. Available: http://yann.lecun.com/exdb/mnist 2 (2010)
+                          <br>
+                          <br>
+                          [18] Xiao, H., Rasul, K., Vollgraf, R.: Fashion-mnist: a novel image dataset for benchmarking machine learning algorithms (2017), http://arxiv.org/abs/1708.07747, cite arxiv:1708.07747 Comment: Dataset is freely available at https://github.com/zalandoresearch/fashion-mnist Benchmark is available at http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/
+                          <br>
+                          <br>
+                          [19] Becker, B., Kohavi, R.: Adult. UCI Machine Learning Repository (1996), DOI: https://doi.org/10.24432/C5XW20
+                          <br>
+                          <br>
+                          [20] Estève, L., Lemaitre, G., Grisel, O., Varoquaux, G., Amor, A., Lilian, Rospars, B., et al.: Inria/scikit-learn-mooc: Third mooc session (Oct 2022). https://doi.org/10.5281/zenodo.7220307, https://doi.org/10.5281/zenodo.7220307
+                          <br>
+                          <br>
+                          [21] Virtanen, P., Gommers, R., Oliphant, T.E., Haberland, M., Reddy, T., Cournapeau, D., Burovski, E., Peterson, P., Weckesser, W., Bright, J., van der Walt, S.J., Brett, M., Wilson, J., Millman, K.J., Mayorov, N., Nelson, A.R.J., Jones, E., Kern, R., Larson, E., Carey, C.J., Polat, İ., Feng, Y., Moore, E.W., VanderPlas, J., Laxalde, D., Perktold, J., Cimrman, R., Henriksen, I., Quintero, E.A., Harris, C.R., Archibald, A.M., Ribeiro, A.H., Pedregosa, F., van Mulbregt, P., SciPy 1.0 Contributors: scipy.cluster.hierarchy.linkage &x2014; SciPy v1.13.1 Manual— docs.scipy.org. https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.linkage.html#scipy.cluster.hierarchy.linkage (2020), [Accessed 19-06-2024]
+                          <br>
+                          <br>
+                          [22] Ran, X., X.Y.L.Y.e.a.: Comprehensive survey on hierarchical clustering algorithms and the recent developments. Artif Intell Rev 56, 8219–8264 (2023), https://doi.org/10.1007/s10462-022-10366-
+                        </p>
+                </div>
+            </div>
+        </section>
+
+        
+
+    <footer>
+        <p>&copy; 2025 Nicoline R. W. Nymand-Andersen</p>
+    </footer>
+</body>
+</html>
