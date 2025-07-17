@@ -16,7 +16,6 @@ body {
 
 header {
     background-color: #ffffffe7;
-    /* background-color: #302c54a9; */
     color: #fff;
     padding: 20px 20px;
     text-align: center;
@@ -63,9 +62,10 @@ main {
     font-family: 'futura-pt-rounded', sans-serif;
     color: #333;
 }
-
+.info-box.projects:hover {
+    background-color: #ada6a6b5;
+  }
 .info-box img {
-    /* display: block; */
     width:100%;
     margin: auto;
 }
@@ -77,18 +77,19 @@ main {
   }
 
 .info-box a:hover {
-    color: #000000;
+    color: #003cff;
   }
 
-.cv-row {
+  .cv-row {
     display: flex;
-    gap: 10px; 
-    flex-wrap: wrap;
+    gap: 10px;
+    flex-wrap: nowrap;
+    flex: 3;
 }
 
 .cv-box {
     background-color: #ffffff83;
-    border-radius: 5px; 
+    border-radius: 5px;
     padding: 20px;
     margin: 20px 0;
     font-family: 'futura-pt-rounded', sans-serif;
