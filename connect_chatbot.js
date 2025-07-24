@@ -11,7 +11,7 @@ async function getResponse() {
     responseDiv.innerText = "Thinking...";
   
     try {
-      const res = await fetch("https://f7aa73ae-c426-45e5-b840-f50c1ee5f069-00-1r88rj5wtpw2w.kirk.replit.dev/", {
+      const res = await fetch("https://f7aa73ae-c426-45e5-b840-f50c1ee5f069-00-1r88rj5wtpw2w.kirk.replit.dev/chatbot", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
