@@ -11,7 +11,7 @@ async function getResponse() {
     responseDiv.innerText = "Thinking...";
   
     try {
-      const res = await fetch("https://replit.com/@niconymand/website-chatbot", {
+      const res = await fetch("https://website-chatbot-niconymand.replit.app/chatbot", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
