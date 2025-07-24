@@ -15,7 +15,7 @@
         <h2 style="font-size: 19px;color:#494949;">M.Sc. Computer Science and M.Sc. Artificial Intelligence</h2>
         <br>
         <h2 style="font-size: 14px;color:#494949;">Hello! Welcome to my page where I present my projects, hobbies and interests. For context, I am graduating from my double degree in Computer Science at TUM and 
-            Artificial intelligence from IP Paris in the summer of 2025. I am eager to continue creating sustainable artificial intelligence that benefits our democratic society. Currently looking for research or full-time 
+            Artificial intelligence from IP Paris in the summer of 2025. I am eager to continue creating sustainable artificial intelligence that benefits our society. Currently looking for research or full-time 
             opportunities! If this piques your interest, please do not hesitate to get in touch with me!</h2>
         <br>
             <p>
@@ -31,6 +31,12 @@
     </header>
 
     <main>
+        <div class="chatbot">
+            <p>Need answers, not essays? Ask my chatbot instead 👇</p>
+            <input type="text" id="userQuery" placeholder='Try "Why is Nicoline the perfect candidate?"' />
+            <button onclick="getResponse()">Submit</button>
+            <div class="response" id="chatResponse">Response will appear here.</div>
+        </div>
         <section class="about">
             <h2>Skills</h2>
             <div class="box-container">
@@ -75,18 +81,6 @@
                         inquiries regarding suitable spacecraft instruments based on a given space-mission statement.</p>
                 </div>
                 
-                <!-- <div style="flex-basis: 100%; height: 0;"></div>
-                
-                <div class="info-box">
-                    <p style="font-size: 14px;color:#494949;">Sierpiński triangle</p>
-                    <img src="images/Portrait.PNG" >
-                    <p>Development of a data corpus to ameliorate the response capabilities of existing NLP models. Using the provided data, the model is then able to answer inquiries regarding suitable spacecraft instruments based on a given space-mission statement.</p>
-                </div>
-                <div class="info-box">
-                    <p style="font-size: 14px;color:#494949;">Copenhagen Metro</p>
-                    <img src="images/Portrait.PNG" >
-                    <p>Development of a data corpus to ameliorate the response capabilities of existing NLP models. Using the provided data, the model is then able to answer inquiries regarding suitable spacecraft instruments based on a given space-mission statement.</p>
-                </div> -->
             </div>
             
         </section>
@@ -251,14 +245,7 @@
                 <br>
                 <br>
                 
-
                 <br>
-
-                
-                
-
-                
-                
             </div>
             
         </section>
@@ -312,5 +299,6 @@
     <footer>
         <p>&copy; 2025 Nicoline R. W. Nymand-Andersen</p>
     </footer>
+    <script src="chatbot.js"></script>
 </body>
 </html>

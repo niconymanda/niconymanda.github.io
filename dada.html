@@ -125,11 +125,6 @@
                     <br>
                     <p><b>2.3 Fusion Strategies.</b></p>
                     <br>
-                    <!-- \begin{figure}[t!]
-                    \centering
-                    \includegraphics[width=0.95\columnwidth]{figures/mid_fusion_small_fin.pdf}
-                    \caption{Pipeline for Mid Fusion. Features from the text and speech modules are concatenated and passed through an MLP to produce the final classification.}\label{fig:mid_fusion}
-                    \end{figure} -->
 
                     <figure class="centre-figure" style="width: 50%;">
                         <img src="images/dada/mid_fusion_small_fin.png">
@@ -140,12 +135,6 @@
                         <img src="images/dada/late_fusion_small_fin.png">
                         <figcaption><strong>Figure 3:</strong> Pipeline for Late Fusion. Predictions from the speech and text models are combined using a weighted mean to produce the final classification.</figcaption>
                     </figure>
-                    <!-- \begin{figure}[t!]
-                    \centering
-                    \includegraphics[width=0.95\columnwidth]{figures/late_fusion_small_fin.pdf}
-                    \caption{Pipeline for Late Fusion. Predictions from the speech and text models are combined using a weighted mean to produce the final classification.}\label{fig:late_fusion}
-                    \vspace{-\baselineskip}
-                    \end{figure} -->
                     <br>
                     <p>After independently training the speech and text models, we freeze their parameters and combine their features using one of two fusion strategies: mid fusion or late fusion.
                     <br>
@@ -202,19 +191,6 @@
                         </tbody>
                     </table>
                     
-                        <!-- \begin{table}[!t]\centering
-                          \caption{ABX accuracy of text models (in \%) fine-tuned on Wikiquotes and VoxCeleb2~\cite{voxceleb2}, on the validation sets. The parameter $\lambda$ denotes the margin used in Eq.~\ref{eq:triplet_loss}.}
-                          \label{tab:results_text_model}
-                          \scriptsize
-                          \begin{tabular}{ccccc}\toprule
-                            % \multirow{2}{*}{Model}       & \multicolumn{2}{c}{Hyperparameters} & \multirow{2}{*}{WikiQuotes} &  \multirow{2}{*}{VoxCeleb2}   &  \multirow{2}{*}{In The Wild} \\\cmidrule{2-3}
-                            Model                        & $\lambda$     & Wikiquotes    & VoxCeleb2 \\ \midrule T5 Encoder~\cite{t5} &
-                            0.44                         & 77.6          & 76.8                      \\ Flan-T5 Encoder~\cite{flan-t5} & 0.35 & 76.0 & 75.3 \\
-                            ModernBERT~\cite{modernBERT} & 0.50          & 81.0          & 70.0      \\ DeBERTa~\cite{deberta} &
-                            0.50                         & \textbf{84.1} & \textbf{86.5}             \\\bottomrule
-                          \end{tabular}
-                        \vspace{-\baselineskip}
-                        \end{table} -->
                     <p><br>
                     We benchmark the text model using state-of-the-art encoder-only architectures: DeBERTa~\cite{deberta}, ModernBERT~\cite{modernBERT}, and the encoder of T5~\cite{t5} and Flan-T5~\cite{flan-t5}. Encoder-only models are well-suited for authorship attribution as they generate fixed-size representations, capturing stylistic patterns and semantic coherence. To identify 
                     the most effective architecture, we fine-tuned each model using Ray Tune~\cite{liaw:tune}, optimizing the triplet loss margin $\lambda$ (second column in Table 1), the number of hidden layers for feature extraction and the number of fully connected layers after the aggregated features. These numbers differ from model to model, but for the 
@@ -291,27 +267,6 @@
                       </table>
                       
                     <p>
-                        <!-- \begin{table}[t]\centering
-                        \caption{Performance (in \%) of DADA compared to state-of-the-art baselines.
-                            Our mid fusion strategy outperforms all baselines on ASV Spoof 21 and achieves minimum EER for In The Wild and MLAAD[en].}\label{tab:global_results}
-                        \scriptsize
-                        \begin{tabular}{lcccccc}
-                            \toprule
-                            \multirow{2}{*}{Method} & \multicolumn{2}{c}{ASVspoof21} & \multicolumn{2}{c}{In The Wild} & \multicolumn{2}{c}{MLAAD[en]}                                                               \\\cmidrule{2-7}
-                                                    & F1~$\uparrow$                  & EER~$\downarrow$                & F1~$\uparrow$                 & EER~$\downarrow$ & F1~$\uparrow$  & EER~$\downarrow$        \\\cmidrule{1-7}
-                            LCNN~\cite{lfcc_lcnn}   & 19.7                           & 25.5                            & 37.3                          & 65.6             & 65.4           & 37.2                    \\
-                            Rawnet2~\cite{rawnet2}  & 21.3                           & 22.3                            & 60.2                          & 37.8             & 67.6           & 33.9                    \\
-                            SLIM~\cite{slim}        & 65.1                           & \phantom{0}4.4                  & 89.8                          & 12.5             & 89.2           & 10.7                    \\
-                            AASIST~\cite{aasist}    & 70.7                           & \phantom{0}3.6                  & 84.7                          & 17.5             & 85.6           & 14.5                    \\ \midrule
-                            \multicolumn{7}{l}{\textbf{DADA Variants (Ours)}}                                                                                                                                        \\
-                            Text-Only               & \phantom{0}0.8                 & 46.1                            & \phantom{0}0.6                & 47.7             & \phantom{0}0.0 & 50.1                    \\
-                            Speech-Only             & 89.6                           & \phantom{0}3.1                  & 68.6                          & 13.8             & 75.4           & 15.3                    \\
-                            Late Fusion             & 89.2                           & \phantom{0}2.9                  & 70.1                          & 13.3             & 84.0           & 14.8                    \\
-                            \textbf{Mid Fusion}     & \textbf{91.0}                  & \textbf{\phantom{0}2.7}         & 72.1                          & \textbf{11.8}    & 79.7           & \textbf{\phantom{0}9.8}
-                            \\ \bottomrule
-                        \end{tabular}
-                        \vspace{-\baselineskip}
-                        \end{table} -->
                     <br>
                     Our results can be found in Table 2.
                     <br>
